@@ -64,11 +64,17 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+module.exports = require("pixi.js");
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84,7 +90,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var PIXI = __webpack_require__(1);
+var PIXI = __webpack_require__(0);
 var IsoTile = (function (_super) {
     __extends(IsoTile, _super);
     function IsoTile(tilemap, x, y, height, attributes) {
@@ -183,12 +189,6 @@ exports.default = IsoTile;
 
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = require("pixi.js");
-
-/***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -205,15 +205,14 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var PIXI = __webpack_require__(1);
-var IsoTile_1 = __webpack_require__(0);
+var PIXI = __webpack_require__(0);
+var IsoTile_1 = __webpack_require__(1);
+var IsoSprite_1 = __webpack_require__(3);
 var IsoMap = (function (_super) {
     __extends(IsoMap, _super);
     function IsoMap() {
         var _this = _super.call(this) || this;
         _this.clean();
-        _this._orderChanged = false;
-        _this.camera = new PIXI.Point();
         return _this;
     }
     IsoMap.prototype.setGeneralAttributes = function (attributes) {
@@ -224,6 +223,12 @@ var IsoMap = (function (_super) {
     };
     IsoMap.prototype.setTextures = function (textures) {
         this._textures = textures;
+    };
+    IsoMap.prototype.setObjects = function (objects) {
+        this._objects = objects;
+    };
+    IsoMap.prototype.setObjectDescriptors = function (objects) {
+        this._objectDescriptors = objects;
     };
     Object.defineProperty(IsoMap.prototype, "textures", {
         get: function () {
@@ -239,6 +244,10 @@ var IsoMap = (function (_super) {
     };
     IsoMap.prototype.clean = function () {
         this.removeChildren();
+        this._orderChanged = false;
+        this._objects = [];
+        this._objectDescriptors = null;
+        this.camera = new PIXI.Point();
         this._options = null;
         this._tiles = null;
         this._textures = null;
@@ -249,22 +258,25 @@ var IsoMap = (function (_super) {
     IsoMap.prototype.build = function () {
         this.removeChildren();
         if (this._options === null) {
-            return "IsoMap's options can't be null.";
+            throw "IsoMap's options can't be null.";
         }
         if (this._tiles === null) {
-            return "IsoMap's tiles can't be null.";
+            throw "IsoMap's tiles can't be null.";
         }
         if (this._textures === null) {
-            return "IsoMap's textures can't be null.";
+            throw "IsoMap's textures can't be null.";
         }
         if (this._mapData === null) {
-            return "IsoMap's mapData can't be null.";
+            throw "IsoMap's mapData can't be null.";
         }
         if (this._mapWidth === null) {
-            return "IsoMap's mapWidth can't be null.";
+            throw "IsoMap's mapWidth can't be null.";
         }
         if (this._mapHeight === null) {
-            return "IsoMap's mapHeight can't be null.";
+            throw "IsoMap's mapHeight can't be null.";
+        }
+        if (this._objectDescriptors === null) {
+            throw "IsoMap's object descriptors can't be null.";
         }
         var size = this._mapWidth * this._mapHeight;
         for (var y = 0; y < this._mapHeight; ++y) {
@@ -275,6 +287,11 @@ var IsoMap = (function (_super) {
                     this.addChild(new IsoTile_1.default(this, x, y, data[1], this._tiles[tileID]));
                 }
             }
+        }
+        for (var _i = 0, _a = this._objects; _i < _a.length; _i++) {
+            var object = _a[_i];
+            var h = this._mapData[object.x + object.y * this._mapWidth][1];
+            this.addChild(new IsoSprite_1.default(this, object, h, this._objectDescriptors[object.id]));
         }
     };
     Object.defineProperty(IsoMap.prototype, "globalAttributes", {
@@ -319,8 +336,65 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var PIXI = __webpack_require__(0);
+var IsoSprite = (function (_super) {
+    __extends(IsoSprite, _super);
+    function IsoSprite(tilemap, tile, tileHeight, obj) {
+        var _this = _super.call(this) || this;
+        _this._tilemap = tilemap;
+        _this._tileHeight = tileHeight;
+        _this.texture = new PIXI.Texture(tilemap.textures[obj.tileset], obj.frame);
+        _this.anchor.x = 0.5;
+        _this.anchor.y = 1;
+        _this._object = obj;
+        _this._tile = tile;
+        _this.z = (tile.x + tile.y) * _this._tilemap.globalAttributes.tileWidth / 4 + 1;
+        return _this;
+    }
+    Object.defineProperty(IsoSprite.prototype, "z", {
+        get: function () {
+            return this._z;
+        },
+        set: function (value) {
+            this._z = value;
+            this._tilemap.refreshOrder();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IsoSprite.prototype._updatePosition = function () {
+        var ga = this._tilemap.globalAttributes;
+        var camera = this._tilemap.camera;
+        this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2 + camera.x;
+        this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight + camera.y;
+    };
+    IsoSprite.prototype.update = function (delta) {
+        this._updatePosition();
+    };
+    return IsoSprite;
+}(PIXI.Sprite));
+exports.default = IsoSprite;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var IsoMap_1 = __webpack_require__(2);
-var IsoTile_1 = __webpack_require__(0);
+var IsoTile_1 = __webpack_require__(1);
 var IsoMap = (function (_super) {
     __extends(IsoMap, _super);
     function IsoMap() {

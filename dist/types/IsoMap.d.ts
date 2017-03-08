@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import IsoTile from './IsoTile';
+import IsoObject from './IsoObject';
 declare class IsoMap extends PIXI.Container {
     children: IsoMap.IsoObject[];
     camera: PIXI.Point;
@@ -9,15 +10,19 @@ declare class IsoMap extends PIXI.Container {
     private _mapWidth;
     private _mapHeight;
     private _mapData;
+    private _objects;
+    private _objectDescriptors;
     private _orderChanged;
     constructor();
     setGeneralAttributes(attributes: IsoMap.Attributes): void;
     setTileAttributes(attributes: IsoTile.Attributes[]): void;
     setTextures(textures: PIXI.BaseTexture[]): void;
+    setObjects(objects: IsoMap.Instance[]): void;
+    setObjectDescriptors(objects: IsoObject[]): void;
     readonly textures: PIXI.BaseTexture[];
     setData(width: number, height: number, data: number[][]): void;
     clean(): void;
-    build(): "IsoMap's options can't be null." | "IsoMap's tiles can't be null." | "IsoMap's textures can't be null." | "IsoMap's mapData can't be null." | "IsoMap's mapWidth can't be null." | "IsoMap's mapHeight can't be null." | undefined;
+    build(): void;
     readonly globalAttributes: IsoMap.Attributes | null;
     refreshOrder(): void;
     update(delta: number): void;
@@ -26,6 +31,11 @@ declare module IsoMap {
     interface IsoObject extends PIXI.DisplayObject {
         z: number;
         update(delta: number): void;
+    }
+    interface Instance {
+        x: number;
+        y: number;
+        id: number;
     }
     interface Attributes {
         tileWidth: number;
