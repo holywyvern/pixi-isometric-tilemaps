@@ -53,12 +53,13 @@ abstract class IsoCharacter extends PIXI.Container {
         this._refreshCoordinates();
     }
 
-    setAnimation(frames: number[], speed: number, loops: number=-1) {
+    setAnimation(frames: number[], speed: number, loops: number=-1, wait = false) {
         this._queue.push({
             type: IsoCharacter.ActionType.ANIMATE,
             loops,
             frames,
-            speed
+            speed,
+            wait
         });
     }
 
@@ -124,6 +125,7 @@ module IsoCharacter {
         loops     : number;
         frames    : number[];
         speed     : number;
+        wait      : boolean;
     }
 
     export interface FaceAction {
