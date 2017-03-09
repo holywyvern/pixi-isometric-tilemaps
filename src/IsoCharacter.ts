@@ -14,18 +14,21 @@ abstract class IsoCharacter extends PIXI.Container {
     private _animation   : IsoCharacter.AnimationAction|null;
     private _executing   : boolean;
     private _attributes  : IsoMap.Attributes;
-
+    
+    scale        : PIXI.Point;
+    direction   : IsoCharacter.Direction;
+    frame       : number;
     frameWidth  : number;
-    frameHeight : number;
     opacity     : number;
     texture     : PIXI.BaseTexture
 
-    constructor(attributes: IsoMap.Attributes, texture: PIXI.BaseTexture, frameWidth: number, frameHeight: number) {
+    constructor(attributes: IsoMap.Attributes, texture: PIXI.BaseTexture, frameWidth: number) {
         super();
         this._attributes  = attributes;
         this.texture     = texture;
         this.frameWidth  = frameWidth;
-        this.frameHeight = frameHeight;
+        this.frame       = 0;
+        this.direction   = IsoCharacter.Direction.UP;
         this._x = 0;
         this._y = 0;
         this._height = 0;
@@ -33,6 +36,7 @@ abstract class IsoCharacter extends PIXI.Container {
         this.opacity   = 1;
         this._animation = null;
         this._executing  = false;
+        this.scale = new PIXI.Point(1, 1);
     }
 
     get z() {
@@ -203,7 +207,7 @@ module IsoCharacter {
         }
 
         update(delta: number, character: IsoCharacter) {
-            character.face(this.direction);
+            character.direction = this.direction;
             this._done = true;
         }
 
