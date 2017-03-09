@@ -1,24 +1,26 @@
-import * as PIXI from 'pixi.js';
-import * as raf  from 'raf';
+import * as PIXI    from 'pixi.js';
+import * as raf     from 'raf';
 
-import IsoMap    from './IsoMap';
-import IsoTile   from './IsoTile';
-import IsoObject from './IsoObject';
+import IsoMap       from './IsoMap';
+import IsoTile      from './IsoTile';
+import IsoObject    from './IsoObject';
+import IsoCharacter from './IsoCharacter';
 
 import 'fpsmeter';
 
 
+
 const MAP_DATA = [
-  [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  5], [ 0,  7], [ 0,  7], [ 0,  7], [ 0,  4], [ 1,  3], [ 0,  4],
-  [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  5], [ 0,  7], [ 0,  7], [ 0,  7], [ 0,  4], [ 2,  3], [ 0,  4],
-  [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  5], [ 0,  7], [ 0,  7], [ 0,  6], [ 0,  4], [ 3,  3], [ 0,  4],
-  [0,  7], [0,  7], [ 0,  7], [ 0,  6], [ 0,  5], [ 0,  7], [ 0,  7], [ 0,  5], [ 0,  4], [ 4,  3], [ 0,  4],
-  [0,  7], [0,  7], [ 0,  7], [ 0,  6], [ 0,  5], [ 0,  6], [ 0,  6], [ 0,  5], [ 2,  3], [ 1,  3], [ 0,  4],
+  [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  6], [ 0,  7], [ 0,  7], [ 0,  7], [ 0,  4], [ 1,  3], [ 0,  4],
+  [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  6], [ 0,  7], [ 0,  7], [ 0,  7], [ 0,  4], [ 2,  3], [ 0,  4],
+  [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  6], [ 0,  7], [ 0,  7], [ 0,  6], [ 0,  4], [ 3,  3], [ 0,  4],
+  [0,  7], [0,  7], [ 0,  7], [ 0,  6], [ 0,  6], [ 0,  7], [ 0,  7], [ 0,  5], [ 0,  4], [ 4,  3], [ 0,  4],
+  [0,  7], [0,  7], [ 0,  7], [ 0,  6], [ 0,  6], [ 0,  6], [ 0,  6], [ 0,  5], [ 2,  3], [ 1,  3], [ 0,  4],
   [0,  7], [0,  7], [ 0,  7], [ 0,  5], [ 0,  5], [ 0,  6], [ 0,  5], [ 0,  5], [ 3,  3], [ 0,  4], [ 0,  4],
   [0,  7], [0,  6], [ 0,  6], [ 0,  5], [ 0,  5], [ 0,  5], [ 0,  5], [ 0,  2], [ 4,  1], [ 0,  2], [ 0,  1],
-  [0,  4], [0,  4], [ 0,  2], [ 0,  1], [ 0,  0], [ 0,  0], [ 0,  4], [ 0,  2], [ 1,  1], [ 0,  2], [ 0,  1],
-  [0,  3], [0,  2], [ 0,  2], [ 0,  0], [ 0,  0], [ 0,  0], [ 0,  2], [ 0,  2], [ 2,  1], [ 0,  2], [ 0,  1],
-  [0,  0], [0,  0], [ 0,  0], [ 0,  0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
+  [0,  4], [0,  4], [ 0,  2], [ 0,  1], [ 0,  0], [ 0,  0], [ 0,  3], [ 0,  2], [ 1,  1], [ 0,  2], [ 0,  1],
+  [0,  3], [0,  2], [ 0,  2], [ 0,  0], [ 0,  0], [ 0,  1], [ 0,  2], [ 0,  2], [ 2,  1], [ 0,  2], [ 0,  1],
+  [0,  0], [0,  0], [ 0,  0], [ 0,  0], [ 0,  0], [ 0,  0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
   [0,  0], [0,  0], [ 0,  0], [ 0,  0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
   [0,  0], [0,  0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
 ];
@@ -45,14 +47,25 @@ const ATTRIBUTES : IsoTile.Attributes[] = [
   { tileset:  0, frames: [{ x: 64, y: 0 }, { x: 64, y: 0 }, { x: 64, y: 0 }, { x: 128, y: 0 }], frameDelay: 300, type: "water" },
 ];
 
+const CHARACTERS : IsoCharacter[] = [
+
+];
+
 const OBJECT_DESCRIPTORS : IsoObject[] = [
   { tileset: 0, frame: new PIXI.Rectangle(0,  80, 64, 80), type: "tree" },
   { tileset: 0, frame: new PIXI.Rectangle(64, 80, 64, 32), type: "rock" }
 ];
 
-const img = new Image();
-img.onload = setup;
-img.src = './test-cube.png';
+const tilesetImg = new Image();
+tilesetImg.onload = endLoad;
+tilesetImg.src = './test-cube.png';
+
+const charImg = new Image();
+charImg.onload = endLoad;
+charImg.src = './test-cube.png';
+
+let loaded      = 0;
+const loadCount = 2;
 
 const stage    = new PIXI.Container;
 const renderer = PIXI.autoDetectRenderer(1200, 800);
@@ -74,6 +87,13 @@ stage.addChild(tilemap);
 
 let now = Date.now();
 
+function endLoad() {
+  ++loaded;
+  if (loaded >= loadCount) {
+    setup();
+  }
+}
+
 function setup() {
   const time = 0;
   tilemap.setGeneralAttributes({
@@ -82,7 +102,7 @@ function setup() {
   });
   tilemap.setTileAttributes(ATTRIBUTES);
   tilemap.setObjectDescriptors(OBJECT_DESCRIPTORS);
-  tilemap.setTextures([ new PIXI.BaseTexture(img) ]);
+  tilemap.setTextures([ new PIXI.BaseTexture(tilesetImg) ]);
   tilemap.setData(11, 12, MAP_DATA);
   tilemap.setObjects(OBJECTS);
   tilemap.camera.x = 600;

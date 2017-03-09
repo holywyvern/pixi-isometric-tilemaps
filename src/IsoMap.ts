@@ -1,8 +1,9 @@
-import * as PIXI from 'pixi.js';
-import IsoTile   from './IsoTile';
-import IsoObject from './IsoObject';
-import IsoSprite from './IsoSprite';
-
+import * as PIXI          from 'pixi.js';
+import IsoTile            from './IsoTile';
+import IsoObject          from './IsoObject';
+import IsoObjectSprite    from './IsoObjectSprite';
+import IsoCharacter       from './IsoCharacter';
+import IsoCharacterSprite from './IsoCharacterSprite';
 
 class IsoMap extends PIXI.Container {
 
@@ -17,6 +18,7 @@ class IsoMap extends PIXI.Container {
   private _mapData           : null|number[][];
   private _objects           : IsoMap.Instance[];
   private _objectDescriptors : null|IsoObject[];
+  private _characters        : IsoCharacter[];
 
   private _orderChanged : boolean;
 
@@ -46,6 +48,10 @@ class IsoMap extends PIXI.Container {
     this._objectDescriptors = objects;
   }
 
+  setCharacters(characters: IsoCharacter[]) {
+    this._characters = characters;
+  }
+
   get textures() {
     return this._textures as PIXI.BaseTexture[];
   }
@@ -60,6 +66,7 @@ class IsoMap extends PIXI.Container {
     this.removeChildren();
     this._orderChanged      = false;
     this._objects           = [];
+    this._characters        = [];
     this._objectDescriptors = null;
     this.camera             = new PIXI.Point();    
     this._options           = null;
@@ -105,7 +112,10 @@ class IsoMap extends PIXI.Container {
     }  
     for (let object of this._objects)  {
       let h = this.tileAt(object.x, object.y)[1];
-      this.addChild(new IsoSprite(this, object, h, this._objectDescriptors[object.id]));
+      this.addChild(new IsoObjectSprite(this, object, h, this._objectDescriptors[object.id]));
+    }
+    for (let character of this._characters) {
+      this.addChild(new IsoCharacterSprite(this, character));
     }
   }
 

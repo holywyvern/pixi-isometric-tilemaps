@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import IsoMap from './IsoMap';
 import IsoObject from './IsoObject';
-declare class IsoSprite extends PIXI.Sprite {
+declare class IsoObjectSprite extends PIXI.Sprite {
     private _z;
     private _tilemap;
     private _object;
@@ -12,4 +12,4 @@ declare class IsoSprite extends PIXI.Sprite {
     private _updatePosition();
     update(delta: number): void;
 }
-export default IsoSprite;
+export default IsoObjectSprite;

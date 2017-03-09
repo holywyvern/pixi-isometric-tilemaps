@@ -64,7 +64,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -101,7 +101,7 @@ var IsoTile = (function (_super) {
         _this._tileY = y;
         _this._tileHeight = height;
         _this._attributes = attributes;
-        _this.z = (_this._tileX + _this._tileY) * _this._globalAttributes.tileWidth / 4;
+        _this.z = (_this._tileX + _this._tileY) * _this._globalAttributes.tileWidth / 2;
         _this._frame = 0;
         _this._frameCount = 0;
         _this._setupRects();
@@ -272,9 +272,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = __webpack_require__(0);
 var IsoCharacter = (function (_super) {
     __extends(IsoCharacter, _super);
-    function IsoCharacter(tilemap, texture, frameWidth, frameHeight) {
+    function IsoCharacter(attributes, texture, frameWidth, frameHeight) {
         var _this = _super.call(this) || this;
-        _this._tilemap = tilemap;
+        _this._attributes = attributes;
         _this.texture = texture;
         _this.frameWidth = frameWidth;
         _this.frameHeight = frameHeight;
@@ -283,6 +283,8 @@ var IsoCharacter = (function (_super) {
         _this._height = 0;
         _this._queue = [];
         _this.opacity = 1;
+        _this._animation = null;
+        _this._executing = false;
         return _this;
     }
     Object.defineProperty(IsoCharacter.prototype, "z", {
@@ -318,74 +320,146 @@ var IsoCharacter = (function (_super) {
         this._y = y;
         this._refreshCoordinates();
     };
-    IsoCharacter.prototype.setAnimation = function (frames, speed, loops, wait) {
+    IsoCharacter.prototype.animate = function (frames, delay, loops, wait) {
         if (loops === void 0) { loops = -1; }
         if (wait === void 0) { wait = false; }
-        this._queue.push({
-            type: IsoCharacter.ActionType.ANIMATE,
-            loops: loops,
-            frames: frames,
-            speed: speed,
-            wait: wait
-        });
+        var animation = new IsoCharacter.AnimationAction(loops, frames, delay);
+        if (loops >= 0 && wait) {
+            this._animation = null;
+            this._queue.push(animation);
+        }
+        else {
+            this._animation = animation;
+        }
+    };
+    IsoCharacter.prototype.setFrame = function (index) {
     };
     IsoCharacter.prototype.face = function (direction) {
-        this._queue.push({
-            type: IsoCharacter.ActionType.FACE,
-            direction: direction,
-        });
+        this._queue.push(new IsoCharacter.FaceAction(direction));
     };
     IsoCharacter.prototype.walk = function (direction, speed) {
-        this._queue.push({
-            type: IsoCharacter.ActionType.WALK,
-            direction: direction,
-            speed: speed
-        });
+        this._queue.push(new IsoCharacter.WalkAction(direction, speed));
     };
     IsoCharacter.prototype.jump = function (direction, speed, heightDifference) {
-        this._queue.push({
-            type: IsoCharacter.ActionType.JUMP,
-            direction: direction,
-            speed: speed,
-            heightDifference: heightDifference
-        });
+        this._queue.push(new IsoCharacter.JumpAction(direction, speed, heightDifference));
     };
     IsoCharacter.prototype._refreshCoordinates = function () {
-        var ga = this._tilemap.globalAttributes;
-        this._realX = this._x * ga.tileWidth;
-        this._realY = this._y * ga.tileWidth;
+        this._realX = this._x * this._attributes.tileWidth;
+        this._realY = this._y * this._attributes.tileWidth;
     };
     IsoCharacter.prototype._updateAnimation = function (delta) {
+        if (this._animation) {
+            this._animation.update(delta, this);
+        }
     };
-    Object.defineProperty(IsoCharacter.prototype, "currentAction", {
-        get: function () {
-            return this._queue[0];
-        },
-        enumerable: true,
-        configurable: true
-    });
+    IsoCharacter.prototype._updateQueue = function (delta) {
+        var action = this._queue[0];
+        if (action) {
+            action.update(delta, this);
+            if (action.isDone()) {
+                this._queue.shift();
+            }
+        }
+    };
+    IsoCharacter.prototype.isMoving = function () {
+        return false;
+    };
     IsoCharacter.prototype.isAnimating = function () {
-        return this._queue.length > 0;
+        return this.isMoving() || this._queue.length > 0;
     };
     IsoCharacter.prototype.update = function (delta) {
+        this._updateQueue(delta);
         this._updateAnimation(delta);
     };
     return IsoCharacter;
 }(PIXI.Container));
 (function (IsoCharacter) {
-    var ActionType;
-    (function (ActionType) {
-        ActionType[ActionType["WALK"] = 0] = "WALK";
-        ActionType[ActionType["JUMP"] = 1] = "JUMP";
-        ActionType[ActionType["FACE"] = 2] = "FACE";
-        ActionType[ActionType["ANIMATE"] = 3] = "ANIMATE";
-    })(ActionType = IsoCharacter.ActionType || (IsoCharacter.ActionType = {}));
+    var WaitAction = (function () {
+        function WaitAction(time) {
+            this.time = time;
+        }
+        WaitAction.prototype.update = function (delta, character) {
+            this.time -= delta;
+        };
+        WaitAction.prototype.isDone = function () {
+            return this.time <= 0;
+        };
+        return WaitAction;
+    }());
+    IsoCharacter.WaitAction = WaitAction;
+    var AnimationAction = (function () {
+        function AnimationAction(loops, frames, delay) {
+            this.loops = loops;
+            this.frames = frames;
+            this.delay = delay;
+            this._currentFrame = 0;
+            this._frameCount = 0;
+        }
+        AnimationAction.prototype.update = function (delta, character) {
+            if (!this.isDone()) {
+                this._frameCount += delta;
+                if (this._frameCount > this.delay) {
+                    while (this._frameCount > this.delay) {
+                        this._frameCount -= this.delay;
+                        this._currentFrame = (this._currentFrame + 1) % this.frames.length;
+                    }
+                    character.setFrame(this.frames[this._currentFrame]);
+                }
+            }
+        };
+        AnimationAction.prototype.isDone = function () {
+            return this.loops === 0;
+        };
+        return AnimationAction;
+    }());
+    IsoCharacter.AnimationAction = AnimationAction;
+    var FaceAction = (function () {
+        function FaceAction(direction) {
+            this.direction = direction;
+        }
+        FaceAction.prototype.update = function (delta, character) {
+            character.face(this.direction);
+            this._done = true;
+        };
+        FaceAction.prototype.isDone = function () {
+            return this._done;
+        };
+        return FaceAction;
+    }());
+    IsoCharacter.FaceAction = FaceAction;
+    var WalkAction = (function () {
+        function WalkAction(direction, speed) {
+            this.direction = direction;
+            this.speed = speed;
+        }
+        WalkAction.prototype.update = function (delta, character) {
+        };
+        WalkAction.prototype.isDone = function () {
+            return false;
+        };
+        return WalkAction;
+    }());
+    IsoCharacter.WalkAction = WalkAction;
+    var JumpAction = (function () {
+        function JumpAction(direction, speed, heightDifference) {
+            this.direction = direction;
+            this.speed = speed;
+            this.heightDifference = heightDifference;
+        }
+        JumpAction.prototype.update = function (delta, character) {
+        };
+        JumpAction.prototype.isDone = function () {
+            return false;
+        };
+        return JumpAction;
+    }());
+    IsoCharacter.JumpAction = JumpAction;
     var Direction;
     (function (Direction) {
-        Direction[Direction["UP"] = 0] = "UP";
-        Direction[Direction["DOWN"] = 1] = "DOWN";
-        Direction[Direction["LEFT"] = 2] = "LEFT";
-        Direction[Direction["RIGHT"] = 3] = "RIGHT";
+        Direction[Direction["UP"] = 2] = "UP";
+        Direction[Direction["DOWN"] = 4] = "DOWN";
+        Direction[Direction["LEFT"] = 6] = "LEFT";
+        Direction[Direction["RIGHT"] = 8] = "RIGHT";
     })(Direction = IsoCharacter.Direction || (IsoCharacter.Direction = {}));
 })(IsoCharacter || (IsoCharacter = {}));
 exports.default = IsoCharacter;
@@ -410,7 +484,8 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = __webpack_require__(0);
 var IsoTile_1 = __webpack_require__(1);
-var IsoSprite_1 = __webpack_require__(4);
+var IsoObjectSprite_1 = __webpack_require__(5);
+var IsoCharacterSprite_1 = __webpack_require__(4);
 var IsoMap = (function (_super) {
     __extends(IsoMap, _super);
     function IsoMap() {
@@ -433,6 +508,9 @@ var IsoMap = (function (_super) {
     IsoMap.prototype.setObjectDescriptors = function (objects) {
         this._objectDescriptors = objects;
     };
+    IsoMap.prototype.setCharacters = function (characters) {
+        this._characters = characters;
+    };
     Object.defineProperty(IsoMap.prototype, "textures", {
         get: function () {
             return this._textures;
@@ -449,6 +527,7 @@ var IsoMap = (function (_super) {
         this.removeChildren();
         this._orderChanged = false;
         this._objects = [];
+        this._characters = [];
         this._objectDescriptors = null;
         this.camera = new PIXI.Point();
         this._options = null;
@@ -494,7 +573,11 @@ var IsoMap = (function (_super) {
         for (var _i = 0, _a = this._objects; _i < _a.length; _i++) {
             var object = _a[_i];
             var h = this.tileAt(object.x, object.y)[1];
-            this.addChild(new IsoSprite_1.default(this, object, h, this._objectDescriptors[object.id]));
+            this.addChild(new IsoObjectSprite_1.default(this, object, h, this._objectDescriptors[object.id]));
+        }
+        for (var _b = 0, _c = this._characters; _b < _c.length; _b++) {
+            var character = _c[_b];
+            this.addChild(new IsoCharacterSprite_1.default(this, character));
         }
     };
     IsoMap.prototype.tileAt = function (x, y) {
@@ -546,9 +629,68 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = __webpack_require__(0);
-var IsoSprite = (function (_super) {
-    __extends(IsoSprite, _super);
-    function IsoSprite(tilemap, tile, tileHeight, obj) {
+var IsoCharacterSprite = (function (_super) {
+    __extends(IsoCharacterSprite, _super);
+    function IsoCharacterSprite(tilemap, character) {
+        var _this = _super.call(this) || this;
+        _this._tilemap = tilemap;
+        _this._character = character;
+        _this.z = undefined;
+        _this._refreshZ();
+        return _this;
+    }
+    Object.defineProperty(IsoCharacterSprite.prototype, "tileX", {
+        get: function () {
+            return Math.floor(this.x / this._tilemap.globalAttributes.tileWidth);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCharacterSprite.prototype, "tileY", {
+        get: function () {
+            return Math.floor(this.y / this._tilemap.globalAttributes.tileWidth);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IsoCharacterSprite.prototype._refreshZ = function () {
+        var ga = this._tilemap.globalAttributes;
+        var z = (this.tileX + this.tileY) * ga.tileWidth / 2 + ga.tileWidth;
+        if (z !== this.z) {
+            this.z = z;
+            this._tilemap.refreshOrder();
+        }
+    };
+    IsoCharacterSprite.prototype.update = function (delta) {
+        this._character.update(delta);
+        this._refreshZ();
+    };
+    return IsoCharacterSprite;
+}(PIXI.Sprite));
+exports.default = IsoCharacterSprite;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var PIXI = __webpack_require__(0);
+var IsoObjectSprite = (function (_super) {
+    __extends(IsoObjectSprite, _super);
+    function IsoObjectSprite(tilemap, tile, tileHeight, obj) {
         var _this = _super.call(this) || this;
         _this._tilemap = tilemap;
         _this._tileHeight = tileHeight;
@@ -557,10 +699,11 @@ var IsoSprite = (function (_super) {
         _this.anchor.y = 1;
         _this._object = obj;
         _this._tile = tile;
-        _this.z = (tile.x + tile.y) * _this._tilemap.globalAttributes.tileWidth / 4 + 1;
+        var ga = _this._tilemap.globalAttributes;
+        _this.z = (tile.x + tile.y) * ga.tileWidth / 2 + ga.tileWidth;
         return _this;
     }
-    Object.defineProperty(IsoSprite.prototype, "z", {
+    Object.defineProperty(IsoObjectSprite.prototype, "z", {
         get: function () {
             return this._z;
         },
@@ -571,22 +714,22 @@ var IsoSprite = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    IsoSprite.prototype._updatePosition = function () {
+    IsoObjectSprite.prototype._updatePosition = function () {
         var ga = this._tilemap.globalAttributes;
         var camera = this._tilemap.camera;
         this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2 + camera.x;
         this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight + camera.y;
     };
-    IsoSprite.prototype.update = function (delta) {
+    IsoObjectSprite.prototype.update = function (delta) {
         this._updatePosition();
     };
-    return IsoSprite;
+    return IsoObjectSprite;
 }(PIXI.Sprite));
-exports.default = IsoSprite;
+exports.default = IsoObjectSprite;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

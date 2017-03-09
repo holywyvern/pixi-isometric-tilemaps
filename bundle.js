@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 192);
+/******/ 	return __webpack_require__(__webpack_require__.s = 193);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -127,7 +127,7 @@ Object.defineProperty(exports, 'DisplayObject', {
   }
 });
 
-var _Container = __webpack_require__(10);
+var _Container = __webpack_require__(11);
 
 Object.defineProperty(exports, 'Container', {
   enumerable: true,
@@ -271,7 +271,7 @@ Object.defineProperty(exports, 'Texture', {
   }
 });
 
-var _BaseTexture = __webpack_require__(13);
+var _BaseTexture = __webpack_require__(14);
 
 Object.defineProperty(exports, 'BaseTexture', {
   enumerable: true,
@@ -325,7 +325,7 @@ Object.defineProperty(exports, 'CanvasRenderTarget', {
   }
 });
 
-var _Shader = __webpack_require__(9);
+var _Shader = __webpack_require__(10);
 
 Object.defineProperty(exports, 'Shader', {
   enumerable: true,
@@ -334,7 +334,7 @@ Object.defineProperty(exports, 'Shader', {
   }
 });
 
-var _WebGLManager = __webpack_require__(12);
+var _WebGLManager = __webpack_require__(13);
 
 Object.defineProperty(exports, 'WebGLManager', {
   enumerable: true,
@@ -418,7 +418,7 @@ var _settings = __webpack_require__(4);
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _CanvasRenderer = __webpack_require__(11);
+var _CanvasRenderer = __webpack_require__(12);
 
 var _CanvasRenderer2 = _interopRequireDefault(_CanvasRenderer);
 
@@ -2053,7 +2053,7 @@ exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _BaseTexture = __webpack_require__(13);
+var _BaseTexture = __webpack_require__(14);
 
 var _BaseTexture2 = _interopRequireDefault(_BaseTexture);
 
@@ -2676,6 +2676,126 @@ removeAllHandlers(Texture.WHITE);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+exports.__esModule = true;
+exports.loader = exports.prepare = exports.particles = exports.mesh = exports.loaders = exports.interaction = exports.filters = exports.extras = exports.extract = exports.accessibility = undefined;
+
+var _polyfill = __webpack_require__(176);
+
+Object.keys(_polyfill).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+        enumerable: true,
+        get: function get() {
+            return _polyfill[key];
+        }
+    });
+});
+
+var _deprecation = __webpack_require__(145);
+
+Object.keys(_deprecation).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+        enumerable: true,
+        get: function get() {
+            return _deprecation[key];
+        }
+    });
+});
+
+var _core = __webpack_require__(0);
+
+Object.keys(_core).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+        enumerable: true,
+        get: function get() {
+            return _core[key];
+        }
+    });
+});
+
+var _accessibility = __webpack_require__(102);
+
+var accessibility = _interopRequireWildcard(_accessibility);
+
+var _extract = __webpack_require__(147);
+
+var extract = _interopRequireWildcard(_extract);
+
+var _extras = __webpack_require__(35);
+
+var extras = _interopRequireWildcard(_extras);
+
+var _filters = __webpack_require__(74);
+
+var filters = _interopRequireWildcard(_filters);
+
+var _interaction = __webpack_require__(76);
+
+var interaction = _interopRequireWildcard(_interaction);
+
+var _loaders = __webpack_require__(79);
+
+var loaders = _interopRequireWildcard(_loaders);
+
+var _mesh = __webpack_require__(83);
+
+var mesh = _interopRequireWildcard(_mesh);
+
+var _particles = __webpack_require__(84);
+
+var particles = _interopRequireWildcard(_particles);
+
+var _prepare = __webpack_require__(85);
+
+var prepare = _interopRequireWildcard(_prepare);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+// export libs
+
+
+// export core
+_core.utils.mixins.performMixins();
+
+// handle mixins now, after all code has been added, including deprecation
+// import polyfills. Done as an export to make sure polyfills are imported first
+exports.accessibility = accessibility;
+exports.extract = extract;
+exports.extras = extras;
+exports.filters = filters;
+exports.interaction = interaction;
+exports.loaders = loaders;
+exports.mesh = mesh;
+exports.particles = particles;
+exports.prepare = prepare;
+
+/**
+ * A premade instance of the loader that can be used to load resources.
+ *
+ * @name loader
+ * @memberof PIXI
+ * @property {PIXI.loaders.Loader}
+ */
+
+var loader = loaders && loaders.Loader ? new loaders.Loader() : null; // check is there in case user excludes loader lib
+
+exports.loader = loader;
+
+// Always export pixi globally.
+
+global.PIXI = exports; // eslint-disable-line
+//# sourceMappingURL=index.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
 exports.__esModule = true;
@@ -2741,7 +2861,7 @@ exports.default = Shader;
 //# sourceMappingURL=Shader.js.map
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3364,7 +3484,7 @@ Container.prototype.containerUpdateTransform = Container.prototype.updateTransfo
 //# sourceMappingURL=Container.js.map
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3683,7 +3803,7 @@ _utils.pluginTarget.mixin(CanvasRenderer);
 //# sourceMappingURL=CanvasRenderer.js.map
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3743,7 +3863,7 @@ exports.default = WebGLManager;
 //# sourceMappingURL=WebGLManager.js.map
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4488,7 +4608,7 @@ exports.default = BaseTexture;
 //# sourceMappingURL=BaseTexture.js.map
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4798,7 +4918,7 @@ Mesh.DRAW_MODES = {
 //# sourceMappingURL=Mesh.js.map
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4834,126 +4954,6 @@ _Loader2.default.base64 = b64;
 module.exports = _Loader2.default; // eslint-disable-line no-undef
 exports.default = _Loader2.default;
 //# sourceMappingURL=index.js.map
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-exports.__esModule = true;
-exports.loader = exports.prepare = exports.particles = exports.mesh = exports.loaders = exports.interaction = exports.filters = exports.extras = exports.extract = exports.accessibility = undefined;
-
-var _polyfill = __webpack_require__(176);
-
-Object.keys(_polyfill).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-        enumerable: true,
-        get: function get() {
-            return _polyfill[key];
-        }
-    });
-});
-
-var _deprecation = __webpack_require__(145);
-
-Object.keys(_deprecation).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-        enumerable: true,
-        get: function get() {
-            return _deprecation[key];
-        }
-    });
-});
-
-var _core = __webpack_require__(0);
-
-Object.keys(_core).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-        enumerable: true,
-        get: function get() {
-            return _core[key];
-        }
-    });
-});
-
-var _accessibility = __webpack_require__(102);
-
-var accessibility = _interopRequireWildcard(_accessibility);
-
-var _extract = __webpack_require__(147);
-
-var extract = _interopRequireWildcard(_extract);
-
-var _extras = __webpack_require__(35);
-
-var extras = _interopRequireWildcard(_extras);
-
-var _filters = __webpack_require__(74);
-
-var filters = _interopRequireWildcard(_filters);
-
-var _interaction = __webpack_require__(76);
-
-var interaction = _interopRequireWildcard(_interaction);
-
-var _loaders = __webpack_require__(79);
-
-var loaders = _interopRequireWildcard(_loaders);
-
-var _mesh = __webpack_require__(83);
-
-var mesh = _interopRequireWildcard(_mesh);
-
-var _particles = __webpack_require__(84);
-
-var particles = _interopRequireWildcard(_particles);
-
-var _prepare = __webpack_require__(85);
-
-var prepare = _interopRequireWildcard(_prepare);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-// export libs
-
-
-// export core
-_core.utils.mixins.performMixins();
-
-// handle mixins now, after all code has been added, including deprecation
-// import polyfills. Done as an export to make sure polyfills are imported first
-exports.accessibility = accessibility;
-exports.extract = extract;
-exports.extras = extras;
-exports.filters = filters;
-exports.interaction = interaction;
-exports.loaders = loaders;
-exports.mesh = mesh;
-exports.particles = particles;
-exports.prepare = prepare;
-
-/**
- * A premade instance of the loader that can be used to load resources.
- *
- * @name loader
- * @memberof PIXI
- * @property {PIXI.loaders.Loader}
- */
-
-var loader = loaders && loaders.Loader ? new loaders.Loader() : null; // check is there in case user excludes loader lib
-
-exports.loader = loader;
-
-// Always export pixi globally.
-
-global.PIXI = exports; // eslint-disable-line
-//# sourceMappingURL=index.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
 
 /***/ }),
 /* 17 */
@@ -5266,7 +5266,7 @@ var _TextureManager = __webpack_require__(121);
 
 var _TextureManager2 = _interopRequireDefault(_TextureManager);
 
-var _BaseTexture = __webpack_require__(13);
+var _BaseTexture = __webpack_require__(14);
 
 var _BaseTexture2 = _interopRequireDefault(_BaseTexture);
 
@@ -6001,7 +6001,7 @@ _utils.pluginTarget.mixin(WebGLRenderer);
 
 exports.__esModule = true;
 
-var _WebGLManager2 = __webpack_require__(12);
+var _WebGLManager2 = __webpack_require__(13);
 
 var _WebGLManager3 = _interopRequireDefault(_WebGLManager2);
 
@@ -8204,7 +8204,7 @@ var _Texture = __webpack_require__(8);
 
 var _Texture2 = _interopRequireDefault(_Texture);
 
-var _Container2 = __webpack_require__(10);
+var _Container2 = __webpack_require__(11);
 
 var _Container3 = _interopRequireDefault(_Container2);
 
@@ -12736,7 +12736,7 @@ var _utils = __webpack_require__(2);
 
 var utils = _interopRequireWildcard(_utils);
 
-var _CanvasRenderer = __webpack_require__(11);
+var _CanvasRenderer = __webpack_require__(12);
 
 var _CanvasRenderer2 = _interopRequireDefault(_CanvasRenderer);
 
@@ -14322,7 +14322,7 @@ var _settings = __webpack_require__(4);
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _Container = __webpack_require__(10);
+var _Container = __webpack_require__(11);
 
 var _Container2 = _interopRequireDefault(_Container);
 
@@ -15797,7 +15797,7 @@ function areArraysEqual(array1, array2) {
 
 exports.__esModule = true;
 
-var _BaseTexture2 = __webpack_require__(13);
+var _BaseTexture2 = __webpack_require__(14);
 
 var _BaseTexture3 = _interopRequireDefault(_BaseTexture2);
 
@@ -16073,7 +16073,7 @@ exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _BaseTexture2 = __webpack_require__(13);
+var _BaseTexture2 = __webpack_require__(14);
 
 var _BaseTexture3 = _interopRequireDefault(_BaseTexture2);
 
@@ -17373,7 +17373,7 @@ var path = _interopRequireWildcard(_path);
 
 var _core = __webpack_require__(0);
 
-var _resourceLoader = __webpack_require__(15);
+var _resourceLoader = __webpack_require__(16);
 
 var _extras = __webpack_require__(35);
 
@@ -17443,7 +17443,7 @@ Object.defineProperty(exports, 'textureParser', {
   }
 });
 
-var _resourceLoader = __webpack_require__(15);
+var _resourceLoader = __webpack_require__(16);
 
 Object.defineProperty(exports, 'Resource', {
   enumerable: true,
@@ -17503,7 +17503,7 @@ exports.default = function () {
     };
 };
 
-var _resourceLoader = __webpack_require__(15);
+var _resourceLoader = __webpack_require__(16);
 
 var _path = __webpack_require__(6);
 
@@ -17533,7 +17533,7 @@ exports.default = function () {
     };
 };
 
-var _resourceLoader = __webpack_require__(15);
+var _resourceLoader = __webpack_require__(16);
 
 var _Texture = __webpack_require__(8);
 
@@ -17551,7 +17551,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.__esModule = true;
 
-var _Mesh2 = __webpack_require__(14);
+var _Mesh2 = __webpack_require__(15);
 
 var _Mesh3 = _interopRequireDefault(_Mesh2);
 
@@ -17699,7 +17699,7 @@ exports.default = Plane;
 
 exports.__esModule = true;
 
-var _Mesh = __webpack_require__(14);
+var _Mesh = __webpack_require__(15);
 
 Object.defineProperty(exports, 'Mesh', {
   enumerable: true,
@@ -19355,9 +19355,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var PIXI = __webpack_require__(16);
-var IsoTile_1 = __webpack_require__(188);
-var IsoSprite_1 = __webpack_require__(187);
+var PIXI = __webpack_require__(9);
+var IsoTile_1 = __webpack_require__(189);
+var IsoObjectSprite_1 = __webpack_require__(188);
+var IsoCharacterSprite_1 = __webpack_require__(187);
 var IsoMap = (function (_super) {
     __extends(IsoMap, _super);
     function IsoMap() {
@@ -19380,6 +19381,9 @@ var IsoMap = (function (_super) {
     IsoMap.prototype.setObjectDescriptors = function (objects) {
         this._objectDescriptors = objects;
     };
+    IsoMap.prototype.setCharacters = function (characters) {
+        this._characters = characters;
+    };
     Object.defineProperty(IsoMap.prototype, "textures", {
         get: function () {
             return this._textures;
@@ -19396,6 +19400,7 @@ var IsoMap = (function (_super) {
         this.removeChildren();
         this._orderChanged = false;
         this._objects = [];
+        this._characters = [];
         this._objectDescriptors = null;
         this.camera = new PIXI.Point();
         this._options = null;
@@ -19441,7 +19446,11 @@ var IsoMap = (function (_super) {
         for (var _i = 0, _a = this._objects; _i < _a.length; _i++) {
             var object = _a[_i];
             var h = this.tileAt(object.x, object.y)[1];
-            this.addChild(new IsoSprite_1.default(this, object, h, this._objectDescriptors[object.id]));
+            this.addChild(new IsoObjectSprite_1.default(this, object, h, this._objectDescriptors[object.id]));
+        }
+        for (var _b = 0, _c = this._characters; _b < _c.length; _b++) {
+            var character = _c[_b];
+            this.addChild(new IsoCharacterSprite_1.default(this, character));
         }
     };
     IsoMap.prototype.tileAt = function (x, y) {
@@ -20921,7 +20930,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _autoDetectRenderer = __webpack_require__(51);
 
-var _Container = __webpack_require__(10);
+var _Container = __webpack_require__(11);
 
 var _Container2 = _interopRequireDefault(_Container);
 
@@ -21097,7 +21106,7 @@ exports.default = Application;
 
 exports.__esModule = true;
 
-var _Container2 = __webpack_require__(10);
+var _Container2 = __webpack_require__(11);
 
 var _Container3 = _interopRequireDefault(_Container2);
 
@@ -21131,7 +21140,7 @@ var _bezierCurveTo2 = __webpack_require__(106);
 
 var _bezierCurveTo3 = _interopRequireDefault(_bezierCurveTo2);
 
-var _CanvasRenderer = __webpack_require__(11);
+var _CanvasRenderer = __webpack_require__(12);
 
 var _CanvasRenderer2 = _interopRequireDefault(_CanvasRenderer);
 
@@ -22264,7 +22273,7 @@ Graphics._SPRITE_TEXTURE = null;
 
 exports.__esModule = true;
 
-var _CanvasRenderer = __webpack_require__(11);
+var _CanvasRenderer = __webpack_require__(12);
 
 var _CanvasRenderer2 = _interopRequireDefault(_CanvasRenderer);
 
@@ -22998,7 +23007,7 @@ exports.default = WebGLGraphicsData;
 
 exports.__esModule = true;
 
-var _Shader2 = __webpack_require__(9);
+var _Shader2 = __webpack_require__(10);
 
 var _Shader3 = _interopRequireDefault(_Shader2);
 
@@ -25051,7 +25060,7 @@ function calculateSpriteMatrix(outputMatrix, filterArea, textureSize, sprite) {
 
 exports.__esModule = true;
 
-var _WebGLManager2 = __webpack_require__(12);
+var _WebGLManager2 = __webpack_require__(13);
 
 var _WebGLManager3 = _interopRequireDefault(_WebGLManager2);
 
@@ -25065,7 +25074,7 @@ var _Quad2 = _interopRequireDefault(_Quad);
 
 var _math = __webpack_require__(3);
 
-var _Shader = __webpack_require__(9);
+var _Shader = __webpack_require__(10);
 
 var _Shader2 = _interopRequireDefault(_Shader);
 
@@ -25626,7 +25635,7 @@ exports.default = FilterManager;
 
 exports.__esModule = true;
 
-var _WebGLManager2 = __webpack_require__(12);
+var _WebGLManager2 = __webpack_require__(13);
 
 var _WebGLManager3 = _interopRequireDefault(_WebGLManager2);
 
@@ -25841,7 +25850,7 @@ exports.default = MaskManager;
 
 exports.__esModule = true;
 
-var _WebGLManager2 = __webpack_require__(12);
+var _WebGLManager2 = __webpack_require__(13);
 
 var _WebGLManager3 = _interopRequireDefault(_WebGLManager2);
 
@@ -26167,7 +26176,7 @@ function validateContext(gl) {
 
 exports.__esModule = true;
 
-var _CanvasRenderer = __webpack_require__(11);
+var _CanvasRenderer = __webpack_require__(12);
 
 var _CanvasRenderer2 = _interopRequireDefault(_CanvasRenderer);
 
@@ -26920,7 +26929,7 @@ _WebGLRenderer2.default.registerPlugin('sprite', SpriteRenderer);
 exports.__esModule = true;
 exports.default = generateMultiTextureShader;
 
-var _Shader = __webpack_require__(9);
+var _Shader = __webpack_require__(10);
 
 var _Shader2 = _interopRequireDefault(_Shader);
 
@@ -28559,7 +28568,7 @@ function canUploadSameBuffer() {
 exports.__esModule = true;
 exports.default = determineCrossOrigin;
 
-var _url2 = __webpack_require__(189);
+var _url2 = __webpack_require__(190);
 
 var _url3 = _interopRequireDefault(_url2);
 
@@ -35091,7 +35100,7 @@ InteractionTrackingData.FLAGS = Object.freeze({
 
 exports.__esModule = true;
 
-var _resourceLoader = __webpack_require__(15);
+var _resourceLoader = __webpack_require__(16);
 
 var _resourceLoader2 = _interopRequireDefault(_resourceLoader);
 
@@ -35654,7 +35663,7 @@ exports.default = NineSlicePlane;
 
 exports.__esModule = true;
 
-var _Mesh2 = __webpack_require__(14);
+var _Mesh2 = __webpack_require__(15);
 
 var _Mesh3 = _interopRequireDefault(_Mesh2);
 
@@ -35904,7 +35913,7 @@ var _core = __webpack_require__(0);
 
 var core = _interopRequireWildcard(_core);
 
-var _Mesh = __webpack_require__(14);
+var _Mesh = __webpack_require__(15);
 
 var _Mesh2 = _interopRequireDefault(_Mesh);
 
@@ -36177,7 +36186,7 @@ var _pixiGlCore = __webpack_require__(5);
 
 var _pixiGlCore2 = _interopRequireDefault(_pixiGlCore);
 
-var _Mesh = __webpack_require__(14);
+var _Mesh = __webpack_require__(15);
 
 var _Mesh2 = _interopRequireDefault(_Mesh);
 
@@ -37350,7 +37359,7 @@ core.WebGLRenderer.registerPlugin('particle', ParticleRenderer);
 
 exports.__esModule = true;
 
-var _Shader2 = __webpack_require__(9);
+var _Shader2 = __webpack_require__(10);
 
 var _Shader3 = _interopRequireDefault(_Shader2);
 
@@ -38452,7 +38461,7 @@ core.WebGLRenderer.registerPlugin('prepare', WebGLPrepare);
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(191)(module), __webpack_require__(21)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(192)(module), __webpack_require__(21)))
 
 /***/ }),
 /* 182 */
@@ -39381,44 +39390,46 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var PIXI = __webpack_require__(16);
-var IsoSprite = (function (_super) {
-    __extends(IsoSprite, _super);
-    function IsoSprite(tilemap, tile, tileHeight, obj) {
+var PIXI = __webpack_require__(9);
+var IsoCharacterSprite = (function (_super) {
+    __extends(IsoCharacterSprite, _super);
+    function IsoCharacterSprite(tilemap, character) {
         var _this = _super.call(this) || this;
         _this._tilemap = tilemap;
-        _this._tileHeight = tileHeight;
-        _this.texture = new PIXI.Texture(tilemap.textures[obj.tileset], obj.frame);
-        _this.anchor.x = 0.5;
-        _this.anchor.y = 1;
-        _this._object = obj;
-        _this._tile = tile;
-        _this.z = (tile.x + tile.y) * _this._tilemap.globalAttributes.tileWidth / 4 + 1;
+        _this._character = character;
+        _this.z = undefined;
+        _this._refreshZ();
         return _this;
     }
-    Object.defineProperty(IsoSprite.prototype, "z", {
+    Object.defineProperty(IsoCharacterSprite.prototype, "tileX", {
         get: function () {
-            return this._z;
-        },
-        set: function (value) {
-            this._z = value;
-            this._tilemap.refreshOrder();
+            return Math.floor(this.x / this._tilemap.globalAttributes.tileWidth);
         },
         enumerable: true,
         configurable: true
     });
-    IsoSprite.prototype._updatePosition = function () {
+    Object.defineProperty(IsoCharacterSprite.prototype, "tileY", {
+        get: function () {
+            return Math.floor(this.y / this._tilemap.globalAttributes.tileWidth);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IsoCharacterSprite.prototype._refreshZ = function () {
         var ga = this._tilemap.globalAttributes;
-        var camera = this._tilemap.camera;
-        this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2 + camera.x;
-        this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight + camera.y;
+        var z = (this.tileX + this.tileY) * ga.tileWidth / 2 + ga.tileWidth;
+        if (z !== this.z) {
+            this.z = z;
+            this._tilemap.refreshOrder();
+        }
     };
-    IsoSprite.prototype.update = function (delta) {
-        this._updatePosition();
+    IsoCharacterSprite.prototype.update = function (delta) {
+        this._character.update(delta);
+        this._refreshZ();
     };
-    return IsoSprite;
+    return IsoCharacterSprite;
 }(PIXI.Sprite));
-exports.default = IsoSprite;
+exports.default = IsoCharacterSprite;
 
 
 /***/ }),
@@ -39438,7 +39449,65 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var PIXI = __webpack_require__(16);
+var PIXI = __webpack_require__(9);
+var IsoObjectSprite = (function (_super) {
+    __extends(IsoObjectSprite, _super);
+    function IsoObjectSprite(tilemap, tile, tileHeight, obj) {
+        var _this = _super.call(this) || this;
+        _this._tilemap = tilemap;
+        _this._tileHeight = tileHeight;
+        _this.texture = new PIXI.Texture(tilemap.textures[obj.tileset], obj.frame);
+        _this.anchor.x = 0.5;
+        _this.anchor.y = 1;
+        _this._object = obj;
+        _this._tile = tile;
+        var ga = _this._tilemap.globalAttributes;
+        _this.z = (tile.x + tile.y) * ga.tileWidth / 2 + ga.tileWidth;
+        return _this;
+    }
+    Object.defineProperty(IsoObjectSprite.prototype, "z", {
+        get: function () {
+            return this._z;
+        },
+        set: function (value) {
+            this._z = value;
+            this._tilemap.refreshOrder();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IsoObjectSprite.prototype._updatePosition = function () {
+        var ga = this._tilemap.globalAttributes;
+        var camera = this._tilemap.camera;
+        this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2 + camera.x;
+        this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight + camera.y;
+    };
+    IsoObjectSprite.prototype.update = function (delta) {
+        this._updatePosition();
+    };
+    return IsoObjectSprite;
+}(PIXI.Sprite));
+exports.default = IsoObjectSprite;
+
+
+/***/ }),
+/* 189 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var PIXI = __webpack_require__(9);
 var IsoTile = (function (_super) {
     __extends(IsoTile, _super);
     function IsoTile(tilemap, x, y, height, attributes) {
@@ -39449,7 +39518,7 @@ var IsoTile = (function (_super) {
         _this._tileY = y;
         _this._tileHeight = height;
         _this._attributes = attributes;
-        _this.z = (_this._tileX + _this._tileY) * _this._globalAttributes.tileWidth / 4;
+        _this.z = (_this._tileX + _this._tileY) * _this._globalAttributes.tileWidth / 2;
         _this._frame = 0;
         _this._frameCount = 0;
         _this._setupRects();
@@ -39601,7 +39670,7 @@ exports.default = IsoTile;
 
 
 /***/ }),
-/* 189 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39629,7 +39698,7 @@ exports.default = IsoTile;
 
 
 var punycode = __webpack_require__(181);
-var util = __webpack_require__(190);
+var util = __webpack_require__(191);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -40340,7 +40409,7 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40363,7 +40432,7 @@ module.exports = {
 
 
 /***/ }),
-/* 191 */
+/* 192 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -40391,27 +40460,27 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var PIXI = __webpack_require__(16);
+var PIXI = __webpack_require__(9);
 var raf = __webpack_require__(91);
 var IsoMap_1 = __webpack_require__(92);
 __webpack_require__(90);
 var MAP_DATA = [
-    [0, 7], [0, 7], [0, 5], [0, 5], [0, 5], [0, 7], [0, 7], [0, 7], [0, 4], [1, 3], [0, 4],
-    [0, 7], [0, 7], [0, 5], [0, 5], [0, 5], [0, 7], [0, 7], [0, 7], [0, 4], [2, 3], [0, 4],
-    [0, 7], [0, 7], [0, 5], [0, 5], [0, 5], [0, 7], [0, 7], [0, 6], [0, 4], [3, 3], [0, 4],
-    [0, 7], [0, 7], [0, 7], [0, 6], [0, 5], [0, 7], [0, 7], [0, 5], [0, 4], [4, 3], [0, 4],
-    [0, 7], [0, 7], [0, 7], [0, 6], [0, 5], [0, 6], [0, 6], [0, 5], [2, 3], [1, 3], [0, 4],
+    [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 7], [0, 7], [0, 7], [0, 4], [1, 3], [0, 4],
+    [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 7], [0, 7], [0, 7], [0, 4], [2, 3], [0, 4],
+    [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 7], [0, 7], [0, 6], [0, 4], [3, 3], [0, 4],
+    [0, 7], [0, 7], [0, 7], [0, 6], [0, 6], [0, 7], [0, 7], [0, 5], [0, 4], [4, 3], [0, 4],
+    [0, 7], [0, 7], [0, 7], [0, 6], [0, 6], [0, 6], [0, 6], [0, 5], [2, 3], [1, 3], [0, 4],
     [0, 7], [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 5], [0, 5], [3, 3], [0, 4], [0, 4],
     [0, 7], [0, 6], [0, 6], [0, 5], [0, 5], [0, 5], [0, 5], [0, 2], [4, 1], [0, 2], [0, 1],
-    [0, 4], [0, 4], [0, 2], [0, 1], [0, 0], [0, 0], [0, 4], [0, 2], [1, 1], [0, 2], [0, 1],
-    [0, 3], [0, 2], [0, 2], [0, 0], [0, 0], [0, 0], [0, 2], [0, 2], [2, 1], [0, 2], [0, 1],
-    [0, 0], [0, 0], [0, 0], [0, 0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
+    [0, 4], [0, 4], [0, 2], [0, 1], [0, 0], [0, 0], [0, 3], [0, 2], [1, 1], [0, 2], [0, 1],
+    [0, 3], [0, 2], [0, 2], [0, 0], [0, 0], [0, 1], [0, 2], [0, 2], [2, 1], [0, 2], [0, 1],
+    [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
     [0, 0], [0, 0], [0, 0], [0, 0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
     [0, 0], [0, 0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
 ];
@@ -40435,13 +40504,19 @@ var ATTRIBUTES = [
     { tileset: 0, frames: [{ x: 64, y: 0 }, { x: 64, y: 0 }, { x: 128, y: 0 }, { x: 64, y: 0 }], frameDelay: 300, type: "water" },
     { tileset: 0, frames: [{ x: 64, y: 0 }, { x: 64, y: 0 }, { x: 64, y: 0 }, { x: 128, y: 0 }], frameDelay: 300, type: "water" },
 ];
+var CHARACTERS = [];
 var OBJECT_DESCRIPTORS = [
     { tileset: 0, frame: new PIXI.Rectangle(0, 80, 64, 80), type: "tree" },
     { tileset: 0, frame: new PIXI.Rectangle(64, 80, 64, 32), type: "rock" }
 ];
-var img = new Image();
-img.onload = setup;
-img.src = './test-cube.png';
+var tilesetImg = new Image();
+tilesetImg.onload = endLoad;
+tilesetImg.src = './test-cube.png';
+var charImg = new Image();
+charImg.onload = endLoad;
+charImg.src = './test-cube.png';
+var loaded = 0;
+var loadCount = 2;
 var stage = new PIXI.Container;
 var renderer = PIXI.autoDetectRenderer(1200, 800);
 var meter = new FPSMeter(document.body, {
@@ -40454,6 +40529,12 @@ document.body.appendChild(renderer.view);
 var tilemap = new IsoMap_1.default;
 stage.addChild(tilemap);
 var now = Date.now();
+function endLoad() {
+    ++loaded;
+    if (loaded >= loadCount) {
+        setup();
+    }
+}
 function setup() {
     var time = 0;
     tilemap.setGeneralAttributes({
@@ -40462,7 +40543,7 @@ function setup() {
     });
     tilemap.setTileAttributes(ATTRIBUTES);
     tilemap.setObjectDescriptors(OBJECT_DESCRIPTORS);
-    tilemap.setTextures([new PIXI.BaseTexture(img)]);
+    tilemap.setTextures([new PIXI.BaseTexture(tilesetImg)]);
     tilemap.setData(11, 12, MAP_DATA);
     tilemap.setObjects(OBJECTS);
     tilemap.camera.x = 600;

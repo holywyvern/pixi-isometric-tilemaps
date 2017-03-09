@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import IsoMap    from './IsoMap';
 import IsoObject from './IsoObject';
 
-class IsoSprite extends PIXI.Sprite {
+class IsoObjectSprite extends PIXI.Sprite {
 
   private _z                : number;
   private _tilemap          : IsoMap;
@@ -19,7 +19,8 @@ class IsoSprite extends PIXI.Sprite {
     this.anchor.y = 1;
     this._object  = obj;
     this._tile    = tile;
-    this.z = (tile.x + tile.y) * (this._tilemap.globalAttributes as IsoMap.Attributes).tileWidth / 4 + 1; 
+    const ga = (this._tilemap.globalAttributes as IsoMap.Attributes);
+    this.z = (tile.x + tile.y) * ga.tileWidth / 2 + ga.tileWidth; 
   }
 
   get z() {
@@ -45,4 +46,4 @@ class IsoSprite extends PIXI.Sprite {
 
 }
 
-export default IsoSprite;
+export default IsoObjectSprite;

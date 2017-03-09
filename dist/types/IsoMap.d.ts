@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import IsoTile from './IsoTile';
 import IsoObject from './IsoObject';
+import IsoCharacter from './IsoCharacter';
 declare class IsoMap extends PIXI.Container {
     children: IsoMap.IsoObject[];
     camera: PIXI.Point;
@@ -12,6 +13,7 @@ declare class IsoMap extends PIXI.Container {
     private _mapData;
     private _objects;
     private _objectDescriptors;
+    private _characters;
     private _orderChanged;
     constructor();
     setGeneralAttributes(attributes: IsoMap.Attributes): void;
@@ -19,6 +21,7 @@ declare class IsoMap extends PIXI.Container {
     setTextures(textures: PIXI.BaseTexture[]): void;
     setObjects(objects: IsoMap.Instance[]): void;
     setObjectDescriptors(objects: IsoObject[]): void;
+    setCharacters(characters: IsoCharacter[]): void;
     readonly textures: PIXI.BaseTexture[];
     setData(width: number, height: number, data: number[][]): void;
     clean(): void;

@@ -31,7 +31,7 @@ class IsoTile extends PIXI.Container {
     this._tileY    = y;
     this._tileHeight = height;
     this._attributes = attributes;
-    this.z = (this._tileX + this._tileY) * this._globalAttributes.tileWidth / 4; 
+    this.z = (this._tileX + this._tileY) * this._globalAttributes.tileWidth / 2; 
     this._frame = 0;
     this._frameCount = 0;
     this._setupRects();  
