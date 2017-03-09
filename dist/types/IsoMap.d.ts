@@ -23,6 +23,7 @@ declare class IsoMap extends PIXI.Container {
     setData(width: number, height: number, data: number[][]): void;
     clean(): void;
     build(): void;
+    tileAt(x: number, y: number): number[];
     readonly globalAttributes: IsoMap.Attributes | null;
     refreshOrder(): void;
     update(delta: number): void;

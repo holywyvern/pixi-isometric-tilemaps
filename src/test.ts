@@ -18,9 +18,9 @@ const MAP_DATA = [
   [0,  7], [0,  6], [ 0,  6], [ 0,  5], [ 0,  5], [ 0,  5], [ 0,  5], [ 0,  2], [ 4,  1], [ 0,  2], [ 0,  1],
   [0,  4], [0,  4], [ 0,  2], [ 0,  1], [ 0,  0], [ 0,  0], [ 0,  4], [ 0,  2], [ 1,  1], [ 0,  2], [ 0,  1],
   [0,  3], [0,  2], [ 0,  2], [ 0,  0], [ 0,  0], [ 0,  0], [ 0,  2], [ 0,  2], [ 2,  1], [ 0,  2], [ 0,  1],
-  [0,  0], [0,  0], [ 0,  0], [ 0,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0],
-  [0,  0], [0,  0], [ 0,  0], [ 0,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0],
-  [0,  0], [0,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0], [-1,  0],
+  [0,  0], [0,  0], [ 0,  0], [ 0,  0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
+  [0,  0], [0,  0], [ 0,  0], [ 0,  0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
+  [0,  0], [0,  0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
 ];
 
 const OBJECTS: IsoMap.Instance[] = [
@@ -46,8 +46,8 @@ const ATTRIBUTES : IsoTile.Attributes[] = [
 ];
 
 const OBJECT_DESCRIPTORS : IsoObject[] = [
-  { tileset: 0, frame: new PIXI.Rectangle(0, 64, 64, 128), type: "tree" },
-  { tileset: 0, frame: new PIXI.Rectangle(64, 64, 64, 32), type: "rock" }
+  { tileset: 0, frame: new PIXI.Rectangle(0,  80, 64, 80), type: "tree" },
+  { tileset: 0, frame: new PIXI.Rectangle(64, 80, 64, 32), type: "rock" }
 ];
 
 const img = new Image();
@@ -60,7 +60,7 @@ const renderer = PIXI.autoDetectRenderer(1200, 800);
 const meter = new FPSMeter(document.body, {
   // Theme
   theme: 'colorful', // Meter theme. Build in: 'dark', 'light', 'transparent', 'colorful'.
-  heat:  0,      // Allow themes to use coloring by FPS heat. 0 FPS = red, maxFps = green.
+  heat:  1,      // Allow themes to use coloring by FPS heat. 0 FPS = red, maxFps = green.
 
   // Graph
   graph:   1, // Whether to show history graph.

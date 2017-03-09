@@ -64,7 +64,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -114,11 +114,19 @@ var IsoTile = (function (_super) {
         var ga = this._globalAttributes;
         var texture = this._tilemap.textures[this._attributes.tileset];
         var topRect = new PIXI.Rectangle(0, 0, ga.tileWidth, ga.tileWidth / 2);
-        var middleRect = new PIXI.Rectangle(0, 0, ga.tileWidth, ga.heightSize);
-        var bottomRect = new PIXI.Rectangle(0, 0, ga.tileWidth, ga.heightSize);
+        var topLeftWallRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
+        var middleLeftRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
+        var bottomLeftRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
+        var topRightWallRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
+        var middleRightRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
+        var bottomRightRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
         this._topTexture = new PIXI.Texture(texture, topRect);
-        this._middleTexture = new PIXI.Texture(texture, middleRect);
-        this._bottomTexture = new PIXI.Texture(texture, bottomRect);
+        this._topLeftWallTexture = new PIXI.Texture(texture, topLeftWallRect);
+        this._middleLeftTexture = new PIXI.Texture(texture, middleLeftRect);
+        this._bottomLeftTexture = new PIXI.Texture(texture, bottomLeftRect);
+        this._topRightWallTexture = new PIXI.Texture(texture, topRightWallRect);
+        this._middleRightTexture = new PIXI.Texture(texture, middleRightRect);
+        this._bottomRightTexture = new PIXI.Texture(texture, bottomRightRect);
     };
     IsoTile.prototype._updateRect = function () {
         var frame = this._attributes.frames[this._frame];
@@ -126,34 +134,90 @@ var IsoTile = (function (_super) {
         this._topTexture.frame.x = frame.x;
         this._topTexture.frame.y = frame.y;
         this._topTexture.frame = this._topTexture.frame;
-        this._middleTexture.frame.x = frame.x;
-        this._middleTexture.frame.y = frame.y + ga.tileWidth / 2;
-        this._middleTexture.frame = this._middleTexture.frame;
-        this._bottomTexture.frame.x = frame.x;
-        this._bottomTexture.frame.y = frame.y + ga.tileWidth / 2 + ga.heightSize;
-        this._bottomTexture.frame = this._bottomTexture.frame;
+        this._topLeftWallTexture.frame.x = frame.x;
+        this._topLeftWallTexture.frame.y = frame.y + ga.tileWidth / 2;
+        this._topLeftWallTexture.frame = this._topLeftWallTexture.frame;
+        this._middleLeftTexture.frame.x = frame.x;
+        this._middleLeftTexture.frame.y = frame.y + ga.tileWidth / 2 + ga.heightSize;
+        this._middleLeftTexture.frame = this._middleLeftTexture.frame;
+        this._bottomLeftTexture.frame.x = frame.x;
+        this._bottomLeftTexture.frame.y = frame.y + ga.tileWidth / 2 + ga.heightSize * 2;
+        this._bottomLeftTexture.frame = this._bottomLeftTexture.frame;
+        this._topRightWallTexture.frame.x = frame.x + ga.tileWidth / 2;
+        this._topRightWallTexture.frame.y = frame.y + ga.tileWidth / 2;
+        this._topRightWallTexture.frame = this._topRightWallTexture.frame;
+        this._middleRightTexture.frame.x = frame.x + ga.tileWidth / 2;
+        this._middleRightTexture.frame.y = frame.y + ga.tileWidth / 2 + ga.heightSize;
+        this._middleRightTexture.frame = this._middleRightTexture.frame;
+        this._bottomRightTexture.frame.x = frame.x + ga.tileWidth / 2;
+        this._bottomRightTexture.frame.y = frame.y + ga.tileWidth / 2 + ga.heightSize * 2;
+        this._bottomRightTexture.frame = this._bottomRightTexture.frame;
     };
     IsoTile.prototype._updatePosition = function () {
         var ga = this._globalAttributes;
         this.x = (this._tileX - this._tileY) * ga.tileWidth / 2 + this._tilemap.camera.x;
         this.y = (this._tileX + this._tileY) * ga.tileWidth / 4 + this._tilemap.camera.y;
     };
-    IsoTile.prototype._buildSprites = function () {
-        this.removeChildren();
+    IsoTile.prototype._buildBottomSprite = function (maxHeight) {
         var ga = this._globalAttributes;
-        var bottom = new PIXI.Sprite(this._bottomTexture);
-        bottom.anchor.x = 0.5;
-        this.addChild(bottom);
-        for (var i = 1, h = this._tileHeight; i <= h; ++i) {
-            var middle = new PIXI.Sprite(this._middleTexture);
-            middle.anchor.x = 0.5;
-            middle.y = -(i * ga.heightSize);
+        if (maxHeight[0] > 0) {
+            var bottom = new PIXI.Sprite(this._bottomLeftTexture);
+            bottom.y = -((this._tileHeight - maxHeight[0] + 1) * ga.heightSize);
+            bottom.x = -ga.tileWidth / 2;
+            this.addChild(bottom);
+        }
+        if (maxHeight[1] > 0) {
+            var bottom = new PIXI.Sprite(this._bottomRightTexture);
+            bottom.y = -((this._tileHeight - maxHeight[1] + 1) * ga.heightSize);
+            bottom.x = 0;
+            this.addChild(bottom);
+        }
+    };
+    IsoTile.prototype._buildMiddleSprites = function (maxHeight) {
+        var ga = this._globalAttributes;
+        for (var i = 0; i < maxHeight[0]; ++i) {
+            var middle = new PIXI.Sprite(this._middleLeftTexture);
+            middle.y = -((this._tileHeight - i) * ga.heightSize);
+            middle.x = -ga.tileWidth / 2;
             this.addChild(middle);
+        }
+        for (var i = 0; i < maxHeight[1]; ++i) {
+            var middle = new PIXI.Sprite(this._middleRightTexture);
+            middle.y = -((this._tileHeight - i) * ga.heightSize);
+            middle.x = 0;
+            this.addChild(middle);
+        }
+    };
+    IsoTile.prototype._buildTopSprite = function (maxHeight) {
+        var ga = this._globalAttributes;
+        if (maxHeight[0] > 0) {
+            var wallTop = new PIXI.Sprite(this._topLeftWallTexture);
+            wallTop.y = -(ga.tileWidth / 2 + ga.heightSize * (this._tileHeight - 1));
+            wallTop.x = -ga.tileWidth / 2;
+            this.addChild(wallTop);
+        }
+        if (maxHeight[1] > 0) {
+            var wallTop = new PIXI.Sprite(this._topRightWallTexture);
+            wallTop.y = -(ga.tileWidth / 2 + ga.heightSize * (this._tileHeight - 1));
+            wallTop.x = 0;
+            this.addChild(wallTop);
         }
         var top = new PIXI.Sprite(this._topTexture);
         top.y = -(ga.tileWidth / 2 + ga.heightSize * this._tileHeight);
         top.anchor.x = 0.5;
         this.addChild(top);
+    };
+    IsoTile.prototype._calculateMaxHeight = function () {
+        var right = this._tileHeight - this._tilemap.tileAt(this._tileX + 1, this._tileY)[1];
+        var bottom = this._tileHeight - this._tilemap.tileAt(this._tileX, this._tileY + 1)[1];
+        return [bottom, right];
+    };
+    IsoTile.prototype._buildSprites = function () {
+        var maxHeight = this._calculateMaxHeight();
+        this.removeChildren();
+        this._buildBottomSprite(maxHeight);
+        this._buildMiddleSprites(maxHeight.map(function (i) { return i - 1; }));
+        this._buildTopSprite(maxHeight);
     };
     IsoTile.prototype._updateFrame = function (delta) {
         var length = this._attributes.frames.length;
@@ -206,8 +270,147 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = __webpack_require__(0);
+var IsoCharacter = (function (_super) {
+    __extends(IsoCharacter, _super);
+    function IsoCharacter(tilemap, texture, frameWidth, frameHeight) {
+        var _this = _super.call(this) || this;
+        _this._tilemap = tilemap;
+        _this.texture = texture;
+        _this.frameWidth = frameWidth;
+        _this.frameHeight = frameHeight;
+        _this._x = 0;
+        _this._y = 0;
+        _this._height = 0;
+        _this._queue = [];
+        _this.opacity = 1;
+        return _this;
+    }
+    Object.defineProperty(IsoCharacter.prototype, "z", {
+        get: function () {
+            return this._z;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCharacter.prototype, "x", {
+        get: function () {
+            return this._realX;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCharacter.prototype, "y", {
+        get: function () {
+            return this._realY;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IsoCharacter.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IsoCharacter.prototype.moveTo = function (x, y) {
+        this._x = x;
+        this._y = y;
+        this._refreshCoordinates();
+    };
+    IsoCharacter.prototype.setAnimation = function (frames, speed, loops, wait) {
+        if (loops === void 0) { loops = -1; }
+        if (wait === void 0) { wait = false; }
+        this._queue.push({
+            type: IsoCharacter.ActionType.ANIMATE,
+            loops: loops,
+            frames: frames,
+            speed: speed,
+            wait: wait
+        });
+    };
+    IsoCharacter.prototype.face = function (direction) {
+        this._queue.push({
+            type: IsoCharacter.ActionType.FACE,
+            direction: direction,
+        });
+    };
+    IsoCharacter.prototype.walk = function (direction, speed) {
+        this._queue.push({
+            type: IsoCharacter.ActionType.WALK,
+            direction: direction,
+            speed: speed
+        });
+    };
+    IsoCharacter.prototype.jump = function (direction, speed, heightDifference) {
+        this._queue.push({
+            type: IsoCharacter.ActionType.JUMP,
+            direction: direction,
+            speed: speed,
+            heightDifference: heightDifference
+        });
+    };
+    IsoCharacter.prototype._refreshCoordinates = function () {
+        var ga = this._tilemap.globalAttributes;
+        this._realX = this._x * ga.tileWidth;
+        this._realY = this._y * ga.tileWidth;
+    };
+    IsoCharacter.prototype._updateAnimation = function (delta) {
+    };
+    Object.defineProperty(IsoCharacter.prototype, "currentAction", {
+        get: function () {
+            return this._queue[0];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IsoCharacter.prototype.isAnimating = function () {
+        return this._queue.length > 0;
+    };
+    IsoCharacter.prototype.update = function (delta) {
+        this._updateAnimation(delta);
+    };
+    return IsoCharacter;
+}(PIXI.Container));
+(function (IsoCharacter) {
+    var ActionType;
+    (function (ActionType) {
+        ActionType[ActionType["WALK"] = 0] = "WALK";
+        ActionType[ActionType["JUMP"] = 1] = "JUMP";
+        ActionType[ActionType["FACE"] = 2] = "FACE";
+        ActionType[ActionType["ANIMATE"] = 3] = "ANIMATE";
+    })(ActionType = IsoCharacter.ActionType || (IsoCharacter.ActionType = {}));
+    var Direction;
+    (function (Direction) {
+        Direction[Direction["UP"] = 0] = "UP";
+        Direction[Direction["DOWN"] = 1] = "DOWN";
+        Direction[Direction["LEFT"] = 2] = "LEFT";
+        Direction[Direction["RIGHT"] = 3] = "RIGHT";
+    })(Direction = IsoCharacter.Direction || (IsoCharacter.Direction = {}));
+})(IsoCharacter || (IsoCharacter = {}));
+exports.default = IsoCharacter;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var PIXI = __webpack_require__(0);
 var IsoTile_1 = __webpack_require__(1);
-var IsoSprite_1 = __webpack_require__(3);
+var IsoSprite_1 = __webpack_require__(4);
 var IsoMap = (function (_super) {
     __extends(IsoMap, _super);
     function IsoMap() {
@@ -290,9 +493,15 @@ var IsoMap = (function (_super) {
         }
         for (var _i = 0, _a = this._objects; _i < _a.length; _i++) {
             var object = _a[_i];
-            var h = this._mapData[object.x + object.y * this._mapWidth][1];
+            var h = this.tileAt(object.x, object.y)[1];
             this.addChild(new IsoSprite_1.default(this, object, h, this._objectDescriptors[object.id]));
         }
+    };
+    IsoMap.prototype.tileAt = function (x, y) {
+        if (x < 0 || x >= this._mapWidth || y < 0 || y >= this._mapHeight) {
+            return [-1, -1];
+        }
+        return (this._mapData && this._mapData[x + y * this._mapWidth]) || [-1, -1];
     };
     Object.defineProperty(IsoMap.prototype, "globalAttributes", {
         get: function () {
@@ -320,7 +529,7 @@ exports.default = IsoMap;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -377,7 +586,7 @@ exports.default = IsoSprite;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -393,8 +602,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var IsoMap_1 = __webpack_require__(2);
+var IsoMap_1 = __webpack_require__(3);
 var IsoTile_1 = __webpack_require__(1);
+var IsoCharacter_1 = __webpack_require__(2);
 var IsoMap = (function (_super) {
     __extends(IsoMap, _super);
     function IsoMap() {
@@ -412,6 +622,15 @@ var IsoTile = (function (_super) {
     return IsoTile;
 }(IsoTile_1.default));
 exports.IsoTile = IsoTile;
+;
+var IsoCharacter = (function (_super) {
+    __extends(IsoCharacter, _super);
+    function IsoCharacter() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return IsoCharacter;
+}(IsoCharacter_1.default));
+exports.IsoCharacter = IsoCharacter;
 ;
 var PIXI;
 (function (PIXI) {
@@ -432,6 +651,15 @@ var PIXI;
         return IsoTile;
     }(IsoTile_1.default));
     PIXI.IsoTile = IsoTile;
+    ;
+    var IsoCharacter = (function (_super) {
+        __extends(IsoCharacter, _super);
+        function IsoCharacter() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return IsoCharacter;
+    }(IsoCharacter_1.default));
+    PIXI.IsoCharacter = IsoCharacter;
     ;
 })(PIXI || (PIXI = {}));
 

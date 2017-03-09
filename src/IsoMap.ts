@@ -104,9 +104,16 @@ class IsoMap extends PIXI.Container {
       }
     }  
     for (let object of this._objects)  {
-      let h = this._mapData[object.x + object.y * this._mapWidth][1];
+      let h = this.tileAt(object.x, object.y)[1];
       this.addChild(new IsoSprite(this, object, h, this._objectDescriptors[object.id]));
     }
+  }
+
+  tileAt(x: number, y: number) {
+    if (x < 0 || x >= (this._mapWidth as number) || y < 0 || y >= (this._mapHeight as number)) {
+      return [-1, -1];
+    }
+    return (this._mapData && this._mapData[x + y * (this._mapWidth as number)]) || [-1, -1];
   }
 
   get globalAttributes() : IsoMap.Attributes | null {
