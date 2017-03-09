@@ -92,6 +92,22 @@ abstract class IsoCharacter extends PIXI.Container {
         this._realY = this._y * ga.tileWidth;
     }
 
+    private _updateAnimation(delta: number) {
+
+    }
+
+    private get currentAction() {
+        return this._queue[0];
+    }
+
+    isAnimating() {
+        return this._queue.length > 0;
+    }
+
+    update(delta: number) {
+        this._updateAnimation(delta);
+    }
+
 }
 
 module IsoCharacter {
