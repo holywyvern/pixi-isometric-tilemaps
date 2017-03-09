@@ -40353,6 +40353,10 @@ var OBJECTS = [
     { x: 6, y: 1, id: 0 },
     { x: 4, y: 4, id: 0 },
     { x: 0, y: 11, id: 0 },
+    { x: 2, y: 8, id: 1 },
+    { x: 3, y: 4, id: 1 },
+    { x: 5, y: 5, id: 1 },
+    { x: 2, y: 6, id: 1 },
 ];
 var ATTRIBUTES = [
     { tileset: 0, frames: [{ x: 0, y: 0 }], frameDelay: 0, type: "land" },
@@ -40362,7 +40366,8 @@ var ATTRIBUTES = [
     { tileset: 0, frames: [{ x: 64, y: 0 }, { x: 64, y: 0 }, { x: 64, y: 0 }, { x: 128, y: 0 }], frameDelay: 300, type: "water" },
 ];
 var OBJECT_DESCRIPTORS = [
-    { tileset: 0, frame: new PIXI.Rectangle(0, 64, 64, 128), type: "tree" }
+    { tileset: 0, frame: new PIXI.Rectangle(0, 64, 64, 128), type: "tree" },
+    { tileset: 0, frame: new PIXI.Rectangle(64, 64, 64, 32), type: "rock" }
 ];
 var img = new Image();
 img.onload = setup;
