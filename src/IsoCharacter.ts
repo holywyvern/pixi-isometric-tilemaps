@@ -83,7 +83,6 @@ abstract class IsoCharacter extends PIXI.Container {
 
     walk(direction: IsoCharacter.Direction, newHeight: number, duration: number) {
         this._queue.push(new IsoCharacter.WalkAction(
-            this,
             direction, 
             newHeight,
             duration,
@@ -91,10 +90,11 @@ abstract class IsoCharacter extends PIXI.Container {
         return this;
     }
 
-    jump(direction: IsoCharacter.Direction, duration: number, newHeight: number) {
+    jump(direction: IsoCharacter.Direction, newHeight: number, jumpheight: number, duration: number) {
         this._queue.push(new IsoCharacter.JumpAction(  
             direction, 
             newHeight,
+            jumpheight,
             duration, 
         ));
     }
@@ -222,24 +222,24 @@ module IsoCharacter {
         duration  : number;
         newHeight : number;
 
-        private _targetX   : number;
-        private _targetY   : number;
-        private _targetH   : number;
-        private _diffX     : number;
-        private _diffY     : number;
-        private _diffH     : number;        
-        private _newMapX   : number;
-        private _newMapY   : number;
-        private _targetSet : boolean;
+        protected _targetX   : number;
+        protected _targetY   : number;
+        protected _targetH   : number;
+        protected _diffX     : number;
+        protected _diffY     : number;
+        protected _diffH     : number;        
+        protected _newMapX   : number;
+        protected _newMapY   : number;
+        protected _targetSet : boolean;
 
-        constructor(character: IsoCharacter, direction: Direction, newHeight: number, duration: number) {
+        constructor(direction: Direction, newHeight: number, duration: number) {
             this.direction = direction;
             this.duration  = duration;
             this.newHeight = newHeight;
             this._targetSet = false;
         }
 
-        private _setTarget(character : IsoCharacter) {
+        protected _setTarget(character : IsoCharacter) {
             let x = 0, y = 0;
             switch (this.direction) {
                 case Direction.UP:
@@ -281,14 +281,17 @@ module IsoCharacter {
                 character.y += this._diffY * delta;
                 character.h += this._diffH * delta;
                 this.duration -= delta;
-                if (this.isDone()) {
-                    console.log('done!')
-                    character.x    = this._targetX;
-                    character.y    = this._targetY;
-                    character.h    = this._targetH;  
-                    character.mapX = this._newMapX;
-                    character.mapY = this._newMapY;
-                }
+                this._endWhenDone(character);
+            }
+        }
+
+        protected _endWhenDone(character: IsoCharacter) {
+            if (this.isDone()) {
+                character.x    = this._targetX;
+                character.y    = this._targetY;
+                character.h    = this._targetH;  
+                character.mapX = this._newMapX;
+                character.mapY = this._newMapY;
             }
         }
 
@@ -298,19 +301,36 @@ module IsoCharacter {
 
     }
 
-    export class JumpAction implements Action {
-        direction        : Direction;
-        heightDifference : number;
-        duration         : number;
+    export class JumpAction extends WalkAction {
 
-        constructor(direction: Direction, duration: number, heightDifference: number) {
-            this.direction        = direction;
-            this.duration         = duration;
-            this.heightDifference = heightDifference;
+        jumpheight : number;
+
+        constructor(direction: Direction, newHeight: number, jumpheight: number, duration: number) {
+            super(direction, newHeight, duration);
+            this.jumpheight = jumpheight;
+        }
+
+        private _updateLowerJump(delta: number, character: IsoCharacter) {
+
+        }
+
+        private _updateUpperJump(delta: number, character: IsoCharacter) {
+
         }
 
         update(delta: number, character: IsoCharacter) {
-            
+            if (!this._targetSet) {
+                this._setTarget(character);
+            }            
+            if (this.duration) {
+                if (this._diffH < 0) {
+                    this._updateLowerJump(delta, character);
+                } else {
+                    this._updateUpperJump(delta, character);
+                }
+                this.duration -= delta;
+                this._endWhenDone(character);            
+            }
         }
 
         isDone() {

@@ -11002,11 +11002,11 @@ var IsoCharacter = (function (_super) {
         return this;
     };
     IsoCharacter.prototype.walk = function (direction, newHeight, duration) {
-        this._queue.push(new IsoCharacter.WalkAction(this, direction, newHeight, duration));
+        this._queue.push(new IsoCharacter.WalkAction(direction, newHeight, duration));
         return this;
     };
-    IsoCharacter.prototype.jump = function (direction, duration, newHeight) {
-        this._queue.push(new IsoCharacter.JumpAction(direction, newHeight, duration));
+    IsoCharacter.prototype.jump = function (direction, newHeight, jumpheight, duration) {
+        this._queue.push(new IsoCharacter.JumpAction(direction, newHeight, jumpheight, duration));
     };
     IsoCharacter.prototype._refreshCoordinates = function () {
         this.x = (this.mapX - this.mapY) * this._attributes.tileWidth / 2;
@@ -11094,7 +11094,7 @@ var IsoCharacter = (function (_super) {
     }());
     IsoCharacter.FaceAction = FaceAction;
     var WalkAction = (function () {
-        function WalkAction(character, direction, newHeight, duration) {
+        function WalkAction(direction, newHeight, duration) {
             this.direction = direction;
             this.duration = duration;
             this.newHeight = newHeight;
@@ -11141,14 +11141,16 @@ var IsoCharacter = (function (_super) {
                 character.y += this._diffY * delta;
                 character.h += this._diffH * delta;
                 this.duration -= delta;
-                if (this.isDone()) {
-                    console.log('done!');
-                    character.x = this._targetX;
-                    character.y = this._targetY;
-                    character.h = this._targetH;
-                    character.mapX = this._newMapX;
-                    character.mapY = this._newMapY;
-                }
+                this._endWhenDone(character);
+            }
+        };
+        WalkAction.prototype._endWhenDone = function (character) {
+            if (this.isDone()) {
+                character.x = this._targetX;
+                character.y = this._targetY;
+                character.h = this._targetH;
+                character.mapX = this._newMapX;
+                character.mapY = this._newMapY;
             }
         };
         WalkAction.prototype.isDone = function () {
@@ -11157,19 +11159,37 @@ var IsoCharacter = (function (_super) {
         return WalkAction;
     }());
     IsoCharacter.WalkAction = WalkAction;
-    var JumpAction = (function () {
-        function JumpAction(direction, duration, heightDifference) {
-            this.direction = direction;
-            this.duration = duration;
-            this.heightDifference = heightDifference;
+    var JumpAction = (function (_super) {
+        __extends(JumpAction, _super);
+        function JumpAction(direction, newHeight, jumpheight, duration) {
+            var _this = _super.call(this, direction, newHeight, duration) || this;
+            _this.jumpheight = jumpheight;
+            return _this;
         }
+        JumpAction.prototype._updateLowerJump = function (delta, character) {
+        };
+        JumpAction.prototype._updateUpperJump = function (delta, character) {
+        };
         JumpAction.prototype.update = function (delta, character) {
+            if (!this._targetSet) {
+                this._setTarget(character);
+            }
+            if (this.duration) {
+                if (this._diffH < 0) {
+                    this._updateLowerJump(delta, character);
+                }
+                else {
+                    this._updateUpperJump(delta, character);
+                }
+                this.duration -= delta;
+                this._endWhenDone(character);
+            }
         };
         JumpAction.prototype.isDone = function () {
             return false;
         };
         return JumpAction;
-    }());
+    }(WalkAction));
     IsoCharacter.JumpAction = JumpAction;
     var Direction;
     (function (Direction) {

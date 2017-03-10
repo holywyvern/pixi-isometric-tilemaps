@@ -23,7 +23,7 @@ declare abstract class IsoCharacter extends PIXI.Container {
     animate(frames: number[], delay: number, loops?: number, wait?: boolean): this;
     face(direction: IsoCharacter.Direction): this;
     walk(direction: IsoCharacter.Direction, newHeight: number, duration: number): this;
-    jump(direction: IsoCharacter.Direction, duration: number, newHeight: number): void;
+    jump(direction: IsoCharacter.Direction, newHeight: number, jumpheight: number, duration: number): void;
     private _refreshCoordinates();
     private _updateAnimation(delta);
     private _updateQueue(delta);
@@ -63,25 +63,26 @@ declare module IsoCharacter {
         direction: Direction;
         duration: number;
         newHeight: number;
-        private _targetX;
-        private _targetY;
-        private _targetH;
-        private _diffX;
-        private _diffY;
-        private _diffH;
-        private _newMapX;
-        private _newMapY;
-        private _targetSet;
-        constructor(character: IsoCharacter, direction: Direction, newHeight: number, duration: number);
-        private _setTarget(character);
+        protected _targetX: number;
+        protected _targetY: number;
+        protected _targetH: number;
+        protected _diffX: number;
+        protected _diffY: number;
+        protected _diffH: number;
+        protected _newMapX: number;
+        protected _newMapY: number;
+        protected _targetSet: boolean;
+        constructor(direction: Direction, newHeight: number, duration: number);
+        protected _setTarget(character: IsoCharacter): void;
         update(delta: number, character: IsoCharacter): void;
+        protected _endWhenDone(character: IsoCharacter): void;
         isDone(): boolean;
     }
-    class JumpAction implements Action {
-        direction: Direction;
-        heightDifference: number;
-        duration: number;
-        constructor(direction: Direction, duration: number, heightDifference: number);
+    class JumpAction extends WalkAction {
+        jumpheight: number;
+        constructor(direction: Direction, newHeight: number, jumpheight: number, duration: number);
+        private _updateLowerJump(delta, character);
+        private _updateUpperJump(delta, character);
         update(delta: number, character: IsoCharacter): void;
         isDone(): boolean;
     }
