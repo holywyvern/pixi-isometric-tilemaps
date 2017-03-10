@@ -20,7 +20,7 @@ class IsoObjectSprite extends PIXI.Sprite {
     this._object  = obj;
     this._tile    = tile;
     const ga = (this._tilemap.globalAttributes as IsoMap.Attributes);
-    this.z = (tile.x + tile.y) * ga.tileWidth / 2 + ga.tileWidth; 
+    this.z = (tile.x + tile.y) * ga.tileWidth / 4 + 1; 
   }
 
   get z() {

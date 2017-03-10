@@ -20,9 +20,9 @@ abstract class IsoCharacter extends PIXI.Container {
     frame       : number;
     frameWidth  : number;
     opacity     : number;
-    texture     : PIXI.BaseTexture
+    texture     : PIXI.BaseTexture|null;
 
-    constructor(attributes: IsoMap.Attributes, texture: PIXI.BaseTexture, frameWidth: number) {
+    constructor(attributes: IsoMap.Attributes, frameWidth: number, texture: PIXI.BaseTexture|null=null) {
         super();
         this._attributes  = attributes;
         this.texture     = texture;
@@ -51,6 +51,14 @@ abstract class IsoCharacter extends PIXI.Container {
         return this._realY;
     }
 
+    get mapX() {
+        return this._x;
+    }
+
+    get mapY() {
+        return this._y;
+    }
+
     get height() {
         return this._height;
     }
@@ -59,6 +67,7 @@ abstract class IsoCharacter extends PIXI.Container {
         this._x = x;
         this._y = y;
         this._refreshCoordinates();
+        return this;
     }
 
     animate(frames: number[], delay: number, loops: number=-1, wait = false) {
@@ -73,16 +82,14 @@ abstract class IsoCharacter extends PIXI.Container {
         } else {
             this._animation = animation;
         }
-    }
-
-    setFrame(index: number) {
-
+        return this;
     }
 
     face(direction: IsoCharacter.Direction) {
         this._queue.push(new IsoCharacter.FaceAction(  
             direction, 
         ));  
+        return this;
     }
 
     walk(direction: IsoCharacter.Direction, speed: number) {
@@ -90,6 +97,7 @@ abstract class IsoCharacter extends PIXI.Container {
             direction, 
             speed 
         ));
+        return this;
     }
 
     jump(direction: IsoCharacter.Direction, speed: number, heightDifference: number) {
@@ -101,8 +109,8 @@ abstract class IsoCharacter extends PIXI.Container {
     }
 
     private _refreshCoordinates() {
-        this._realX = this._x * this._attributes.tileWidth;
-        this._realY = this._y * this._attributes.tileWidth;
+        this._realX = (this._x - this._y) * this._attributes.tileWidth / 2;
+        this._realY = (this._x + this._y) * this._attributes.tileWidth / 4;        
     }
 
     private _updateAnimation(delta: number) {
@@ -186,7 +194,7 @@ module IsoCharacter {
                         this._frameCount -= this.delay;
                         this._currentFrame = (this._currentFrame + 1) % this.frames.length;
                     }
-                    character.setFrame(this.frames[this._currentFrame]);
+                    character.frame = this.frames[this._currentFrame];
                 }
             }
         }        

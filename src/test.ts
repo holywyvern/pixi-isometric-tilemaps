@@ -9,7 +9,6 @@ import IsoCharacter from './IsoCharacter';
 import 'fpsmeter';
 
 
-
 const MAP_DATA = [
   [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  6], [ 0,  7], [ 0,  7], [ 0,  7], [ 0,  4], [ 1,  3], [ 0,  4],
   [0,  7], [0,  7], [ 0,  5], [ 0,  5], [ 0,  6], [ 0,  7], [ 0,  7], [ 0,  7], [ 0,  4], [ 2,  3], [ 0,  4],
@@ -47,8 +46,29 @@ const ATTRIBUTES : IsoTile.Attributes[] = [
   { tileset:  0, frames: [{ x: 64, y: 0 }, { x: 64, y: 0 }, { x: 64, y: 0 }, { x: 128, y: 0 }], frameDelay: 300, type: "water" },
 ];
 
-const CHARACTERS : IsoCharacter[] = [
+const GENERAL_ATTRIBUTES = {
+  tileWidth:  64,
+  heightSize: 16,
+};
 
+class TestCharacter extends IsoCharacter {
+
+  constructor() {
+    super(GENERAL_ATTRIBUTES, 64, null);
+    this.animate([0], 100, -1);
+  }
+
+}
+
+const CHARACTERS : IsoCharacter[] = [
+  new TestCharacter().moveTo(10, 0).face(IsoCharacter.Direction.UP),
+  new TestCharacter().moveTo(0, 1).face(IsoCharacter.Direction.LEFT),  
+  new TestCharacter().moveTo(1, 0).face(IsoCharacter.Direction.DOWN),
+  new TestCharacter().moveTo(3, 2).face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(3, 3).face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(4, 5).face(IsoCharacter.Direction.LEFT),
+  new TestCharacter().moveTo(1, 11).face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(0, 10).face(IsoCharacter.Direction.RIGHT),
 ];
 
 const OBJECT_DESCRIPTORS : IsoObject[] = [
@@ -62,7 +82,7 @@ tilesetImg.src = './test-cube.png';
 
 const charImg = new Image();
 charImg.onload = endLoad;
-charImg.src = './test-cube.png';
+charImg.src = './character.png';
 
 let loaded      = 0;
 const loadCount = 2;
@@ -96,17 +116,19 @@ function endLoad() {
 
 function setup() {
   const time = 0;
-  tilemap.setGeneralAttributes({
-    tileWidth:  64,
-    heightSize: 16,
-  });
+  const charTexture = new PIXI.BaseTexture(charImg);
+  for (let character of CHARACTERS) {
+    character.texture = charTexture;
+  }
+  tilemap.setGeneralAttributes(GENERAL_ATTRIBUTES);
   tilemap.setTileAttributes(ATTRIBUTES);
   tilemap.setObjectDescriptors(OBJECT_DESCRIPTORS);
   tilemap.setTextures([ new PIXI.BaseTexture(tilesetImg) ]);
   tilemap.setData(11, 12, MAP_DATA);
   tilemap.setObjects(OBJECTS);
-  tilemap.camera.x = 600;
-  tilemap.camera.y = 400;
+  tilemap.setCharacters(CHARACTERS);
+  tilemap.x = 600;
+  tilemap.y = 400;
   tilemap.build();
   now = Date.now();
   raf(update);

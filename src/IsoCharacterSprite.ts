@@ -14,10 +14,10 @@ class IsoCharacterSprite extends PIXI.Sprite {
 
   constructor(tilemap : IsoMap, character : IsoCharacter) {
     super();
-    this.texture    = new PIXI.Texture(character.texture);
+    this.texture    = new PIXI.Texture(character.texture || new PIXI.BaseTexture());
     this._tilemap   = tilemap;
     this._character = character;
-    this.z          = undefined;
+    this.z          = -1;
     this._frameX    = 0;
     this._frameY    = 0;
     this.anchor.x   = 0.5;
@@ -35,8 +35,9 @@ class IsoCharacterSprite extends PIXI.Sprite {
   }
 
   private _updateZ() {
+    const character = this._character;
     const ga = (this._tilemap.globalAttributes as IsoMap.Attributes);
-    const z = (this.tileX + this.tileY) * ga.tileWidth / 2 + ga.tileWidth;
+    const z = character.y + 1;
     if (z !== this.z) {
       this.z = z;
       this._tilemap.refreshOrder();
@@ -44,27 +45,40 @@ class IsoCharacterSprite extends PIXI.Sprite {
   }
 
   private _updateFrame() {
+    
     const { direction, frame, texture, frameWidth, scale } = this._character;
+    if (!texture) {
+      return;
+    }
+    const ga = (this._tilemap.globalAttributes as IsoMap.Attributes);
     const spriteFrame = this.texture.frame;
     const h = texture.height / 2;
     const x = frameWidth * frame;
     let   y = 0;
+    let flip = 1;
     
-    
-    if (direction == IsoCharacter.Direction.LEFT || direction == IsoCharacter.Direction.RIGHT) {
-      const flip = (direction == IsoCharacter.Direction.LEFT || direction == IsoCharacter.Direction.RIGHT) ? -1 : 1;
-      this.scale.x = flip * scale.x;
-      this.scale.y = scale.y;
+    if (direction == IsoCharacter.Direction.LEFT) {
       y = h;
-    } 
-    
+      flip = -1;
+    } else if (direction === IsoCharacter.Direction.RIGHT) {
+      flip = -1;
+    } else if (direction === IsoCharacter.Direction.DOWN) {
+      y = h;
+    }
+
+    this.scale.y = scale.y;
+    this.scale.x = flip * scale.x;
+
     if (x !== spriteFrame.x || y !== spriteFrame.y || frameWidth !== spriteFrame.width || spriteFrame.height !== h) {
       spriteFrame.height = h;
       spriteFrame.width  = frameWidth;
       spriteFrame.x      = x;
       spriteFrame.y      = y;
       this.texture.frame = spriteFrame;
-    }
+    } 
+
+    this.position.x = this._character.x;
+    this.position.y = this._character.y  - ga.heightSize * this._tilemap.tileAt(this._character.mapX, this._character.mapY)[1] - this._character.height;
 
   }
 

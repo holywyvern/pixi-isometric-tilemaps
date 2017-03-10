@@ -31,7 +31,7 @@ class IsoTile extends PIXI.Container {
     this._tileY    = y;
     this._tileHeight = height;
     this._attributes = attributes;
-    this.z = (this._tileX + this._tileY) * this._globalAttributes.tileWidth / 2; 
+    this.z = (this._tileX + this._tileY) * this._globalAttributes.tileWidth / 4; 
     this._frame = 0;
     this._frameCount = 0;
     this._setupRects();  
@@ -91,8 +91,8 @@ class IsoTile extends PIXI.Container {
 
   private _updatePosition() {
     const ga = this._globalAttributes;
-    this.x = (this._tileX - this._tileY) * ga.tileWidth / 2 + this._tilemap.camera.x;
-    this.y = (this._tileX + this._tileY) * ga.tileWidth / 4 + this._tilemap.camera.y;
+    this.x = (this._tileX - this._tileY) * ga.tileWidth / 2;
+    this.y = (this._tileX + this._tileY) * ga.tileWidth / 4;
   }
 
   private _buildBottomSprite(maxHeight:number[]) {
