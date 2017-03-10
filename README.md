@@ -33,6 +33,7 @@ In your code:
 ### tilemap.options
 
 The set of general options of your map, it consist of:
+
 |   field    |  type  |              description                  |
 |------------|--------|-------------------------------------------|
 | tileWidth  | number | The width of a tile, the height is size/2 |
