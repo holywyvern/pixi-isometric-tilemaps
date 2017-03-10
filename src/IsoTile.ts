@@ -1,6 +1,8 @@
 import * as PIXI from 'pixi.js';
 import IsoMap    from './IsoMap';
 
+const EMPTY_TEXTURE = new PIXI.BaseTexture();
+
 class IsoTile extends PIXI.Container {
 
   private _z                   : number;
@@ -42,7 +44,7 @@ class IsoTile extends PIXI.Container {
 
   private _setupRects() {
     const ga = this._globalAttributes;
-    const texture             = this._tilemap.textures[this._attributes.tileset];
+    const texture             = this._tilemap.textures ? this._tilemap.textures[this._attributes.tileset] :  EMPTY_TEXTURE;
     const topRect             = new PIXI.Rectangle(0, 0, ga.tileWidth, ga.tileWidth / 2);
     const topLeftWallRect     = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
     const middleLeftRect      = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);

@@ -19598,102 +19598,78 @@ var IsoMap = (function (_super) {
         _this.clean();
         return _this;
     }
-    IsoMap.prototype.setGeneralAttributes = function (attributes) {
-        this._options = attributes;
-    };
-    IsoMap.prototype.setTileAttributes = function (attributes) {
-        this._tiles = attributes;
-    };
-    IsoMap.prototype.setTextures = function (textures) {
-        this._textures = textures;
-    };
-    IsoMap.prototype.setObjects = function (objects) {
-        this._objects = objects;
-    };
-    IsoMap.prototype.setObjectDescriptors = function (objects) {
-        this._objectDescriptors = objects;
-    };
-    IsoMap.prototype.setCharacters = function (characters) {
-        this._characters = characters;
-    };
-    Object.defineProperty(IsoMap.prototype, "textures", {
+    Object.defineProperty(IsoMap.prototype, "camera", {
         get: function () {
-            return this._textures;
+            return this.position;
         },
         enumerable: true,
         configurable: true
     });
-    IsoMap.prototype.setData = function (width, height, data) {
-        this._mapWidth = width;
-        this._mapHeight = height;
-        this._mapData = data;
-    };
     IsoMap.prototype.clean = function () {
         this.removeChildren();
         this._orderChanged = false;
-        this._objects = [];
-        this._characters = [];
-        this._objectDescriptors = null;
-        this.camera = new PIXI.Point();
-        this._options = null;
-        this._tiles = null;
-        this._textures = null;
-        this._mapData = null;
-        this._mapWidth = null;
-        this._mapHeight = null;
+        this.objects = [];
+        this.characters = [];
+        this.objectDescriptors = null;
+        this.options = null;
+        this.tiles = null;
+        this.textures = null;
+        this.mapData = null;
+        this.mapWidth = null;
+        this.mapHeight = null;
     };
     IsoMap.prototype.build = function () {
         this.removeChildren();
-        if (this._options === null) {
+        if (this.options === null) {
             throw "IsoMap's options can't be null.";
         }
-        if (this._tiles === null) {
+        if (this.tiles === null) {
             throw "IsoMap's tiles can't be null.";
         }
-        if (this._textures === null) {
+        if (this.textures === null) {
             throw "IsoMap's textures can't be null.";
         }
-        if (this._mapData === null) {
+        if (this.mapData === null) {
             throw "IsoMap's mapData can't be null.";
         }
-        if (this._mapWidth === null) {
+        if (this.mapWidth === null) {
             throw "IsoMap's mapWidth can't be null.";
         }
-        if (this._mapHeight === null) {
+        if (this.mapHeight === null) {
             throw "IsoMap's mapHeight can't be null.";
         }
-        if (this._objectDescriptors === null) {
+        if (this.objectDescriptors === null) {
             throw "IsoMap's object descriptors can't be null.";
         }
-        var size = this._mapWidth * this._mapHeight;
-        for (var y = 0; y < this._mapHeight; ++y) {
-            for (var x = 0; x < this._mapWidth; ++x) {
-                var data = this._mapData[x + y * this._mapWidth];
+        var size = this.mapWidth * this.mapHeight;
+        for (var y = 0; y < this.mapHeight; ++y) {
+            for (var x = 0; x < this.mapWidth; ++x) {
+                var data = this.mapData[x + y * this.mapWidth];
                 var tileID = data[0];
                 if (tileID >= 0) {
-                    this.addChild(new IsoTile_1.default(this, x, y, data[1], this._tiles[tileID]));
+                    this.addChild(new IsoTile_1.default(this, x, y, data[1], this.tiles[tileID]));
                 }
             }
         }
-        for (var _i = 0, _a = this._objects; _i < _a.length; _i++) {
+        for (var _i = 0, _a = this.objects; _i < _a.length; _i++) {
             var object = _a[_i];
             var h = this.tileAt(object.x, object.y)[1];
-            this.addChild(new IsoObjectSprite_1.default(this, object, h, this._objectDescriptors[object.id]));
+            this.addChild(new IsoObjectSprite_1.default(this, object, h, this.objectDescriptors[object.id]));
         }
-        for (var _b = 0, _c = this._characters; _b < _c.length; _b++) {
+        for (var _b = 0, _c = this.characters; _b < _c.length; _b++) {
             var character = _c[_b];
             this.addChild(new IsoCharacterSprite_1.default(this, character));
         }
     };
     IsoMap.prototype.tileAt = function (x, y) {
-        if (x < 0 || x >= this._mapWidth || y < 0 || y >= this._mapHeight) {
+        if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
             return [-1, -1];
         }
-        return (this._mapData && this._mapData[x + y * this._mapWidth]) || [-1, -1];
+        return (this.mapData && this.mapData[x + y * this.mapWidth]) || [-1, -1];
     };
     Object.defineProperty(IsoMap.prototype, "globalAttributes", {
         get: function () {
-            return this._options;
+            return this.options;
         },
         enumerable: true,
         configurable: true
@@ -39724,13 +39700,14 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = __webpack_require__(8);
+var EMPTY_TEXTURE = new PIXI.BaseTexture();
 var IsoObjectSprite = (function (_super) {
     __extends(IsoObjectSprite, _super);
     function IsoObjectSprite(tilemap, tile, tileHeight, obj) {
         var _this = _super.call(this) || this;
         _this._tilemap = tilemap;
         _this._tileHeight = tileHeight;
-        _this.texture = new PIXI.Texture(tilemap.textures[obj.tileset], obj.frame);
+        _this.texture = new PIXI.Texture(tilemap.textures ? tilemap.textures[obj.tileset] : EMPTY_TEXTURE, obj.frame);
         _this.anchor.x = 0.5;
         _this.anchor.y = 1;
         _this._object = obj;
@@ -39752,9 +39729,8 @@ var IsoObjectSprite = (function (_super) {
     });
     IsoObjectSprite.prototype._updatePosition = function () {
         var ga = this._tilemap.globalAttributes;
-        var camera = this._tilemap.camera;
-        this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2 + camera.x;
-        this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight + camera.y;
+        this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2;
+        this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight;
     };
     IsoObjectSprite.prototype.update = function (delta) {
         this._updatePosition();
@@ -39782,6 +39758,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = __webpack_require__(8);
+var EMPTY_TEXTURE = new PIXI.BaseTexture();
 var IsoTile = (function (_super) {
     __extends(IsoTile, _super);
     function IsoTile(tilemap, x, y, height, attributes) {
@@ -39803,7 +39780,7 @@ var IsoTile = (function (_super) {
     }
     IsoTile.prototype._setupRects = function () {
         var ga = this._globalAttributes;
-        var texture = this._tilemap.textures[this._attributes.tileset];
+        var texture = this._tilemap.textures ? this._tilemap.textures[this._attributes.tileset] : EMPTY_TEXTURE;
         var topRect = new PIXI.Rectangle(0, 0, ga.tileWidth, ga.tileWidth / 2);
         var topLeftWallRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
         var middleLeftRect = new PIXI.Rectangle(0, 0, ga.tileWidth / 2, ga.heightSize);
@@ -40849,13 +40826,15 @@ function setup() {
         var character = CHARACTERS_1[_i];
         character.texture = charTexture;
     }
-    tilemap.setGeneralAttributes(GENERAL_ATTRIBUTES);
-    tilemap.setTileAttributes(ATTRIBUTES);
-    tilemap.setObjectDescriptors(OBJECT_DESCRIPTORS);
-    tilemap.setTextures([new PIXI.BaseTexture(tilesetImg)]);
-    tilemap.setData(11, 12, MAP_DATA);
-    tilemap.setObjects(OBJECTS);
-    tilemap.setCharacters(CHARACTERS);
+    tilemap.options = GENERAL_ATTRIBUTES;
+    tilemap.tiles = ATTRIBUTES;
+    tilemap.objectDescriptors = OBJECT_DESCRIPTORS;
+    tilemap.textures = [new PIXI.BaseTexture(tilesetImg)];
+    tilemap.mapWidth = 11;
+    tilemap.mapHeight = 12;
+    tilemap.mapData = MAP_DATA;
+    tilemap.objects = OBJECTS;
+    tilemap.characters = CHARACTERS;
     tilemap.x = 600;
     tilemap.y = 400;
     tilemap.build();

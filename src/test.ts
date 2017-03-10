@@ -120,13 +120,15 @@ function setup() {
   for (let character of CHARACTERS) {
     character.texture = charTexture;
   }
-  tilemap.setGeneralAttributes(GENERAL_ATTRIBUTES);
-  tilemap.setTileAttributes(ATTRIBUTES);
-  tilemap.setObjectDescriptors(OBJECT_DESCRIPTORS);
-  tilemap.setTextures([ new PIXI.BaseTexture(tilesetImg) ]);
-  tilemap.setData(11, 12, MAP_DATA);
-  tilemap.setObjects(OBJECTS);
-  tilemap.setCharacters(CHARACTERS);
+  tilemap.options           = GENERAL_ATTRIBUTES;
+  tilemap.tiles             = ATTRIBUTES;
+  tilemap.objectDescriptors = OBJECT_DESCRIPTORS;
+  tilemap.textures          = [ new PIXI.BaseTexture(tilesetImg) ];
+  tilemap.mapWidth          = 11;
+  tilemap.mapHeight         = 12;
+  tilemap.mapData           = MAP_DATA;
+  tilemap.objects           = OBJECTS;
+  tilemap.characters        = CHARACTERS;
   tilemap.x = 600;
   tilemap.y = 400;
   tilemap.build();

@@ -8,126 +8,94 @@ import IsoCharacterSprite from './IsoCharacterSprite';
 class IsoMap extends PIXI.Container {
 
   children  : IsoMap.IsoObject[];
-  camera    : PIXI.Point;
 
-  private _options           : null|IsoMap.Attributes;
-  private _tiles             : null|IsoTile.Attributes[];
-  private _textures          : null|PIXI.BaseTexture[];
-  private _mapWidth          : null|number;
-  private _mapHeight         : null|number;
-  private _mapData           : null|number[][];
-  private _objects           : IsoMap.Instance[];
-  private _objectDescriptors : null|IsoObject[];
-  private _characters        : IsoCharacter[];
+  options           : null|IsoMap.Attributes;
+  tiles             : null|IsoTile.Attributes[];
+  textures          : null|PIXI.BaseTexture[];
+  mapWidth          : null|number;
+  mapHeight         : null|number;
+  mapData           : null|number[][];
+  objects           : IsoMap.Instance[];
+  objectDescriptors : null|IsoObject[];
+  characters        : IsoCharacter[];
 
   private _orderChanged : boolean;
 
   constructor() {
     super();
     this.clean();
-
   }
 
-  setGeneralAttributes(attributes : IsoMap.Attributes) {
-    this._options = attributes;
+  get camera() {
+    return this.position;
   }
 
-  setTileAttributes(attributes : IsoTile.Attributes[]) {
-    this._tiles = attributes;
-  }
-
-  setTextures(textures: PIXI.BaseTexture[]) {
-    this._textures = textures;
-  }
-
-  setObjects(objects: IsoMap.Instance[]) {
-    this._objects = objects;
-  }
-
-  setObjectDescriptors(objects: IsoObject[]) {
-    this._objectDescriptors = objects;
-  }
-
-  setCharacters(characters: IsoCharacter[]) {
-    this._characters = characters;
-  }
-
-  get textures() {
-    return this._textures as PIXI.BaseTexture[];
-  }
-
-  setData(width: number, height: number, data: number[][]) {
-    this._mapWidth  = width;
-    this._mapHeight = height;
-    this._mapData   = data;
-  }
 
   clean() {
     this.removeChildren();
     this._orderChanged      = false;
-    this._objects           = [];
-    this._characters        = [];
-    this._objectDescriptors = null;
-    this.camera             = new PIXI.Point();    
-    this._options           = null;
-    this._tiles             = null;
-    this._textures          = null;
-    this._mapData           = null;
-    this._mapWidth          = null;
-    this._mapHeight         = null;
+    this.objects           = [];
+    this.characters        = [];
+    this.objectDescriptors = null;
+    this.options           = null;
+    this.tiles             = null;
+    this.textures          = null;
+    this.mapData           = null;
+    this.mapWidth          = null;
+    this.mapHeight         = null;
   }
 
   build() {
     this.removeChildren();
-    if (this._options === null) {
+    if (this.options === null) {
       throw "IsoMap's options can't be null.";
     }
-    if (this._tiles === null) {
+    if (this.tiles === null) {
       throw "IsoMap's tiles can't be null."
     } 
-    if (this._textures === null) {
+    if (this.textures === null) {
       throw "IsoMap's textures can't be null."
     } 
-    if (this._mapData === null) {
+    if (this.mapData === null) {
       throw "IsoMap's mapData can't be null."
     } 
-    if (this._mapWidth === null) {
+    if (this.mapWidth === null) {
       throw "IsoMap's mapWidth can't be null."
     }    
-    if (this._mapHeight === null) {
+    if (this.mapHeight === null) {
       throw "IsoMap's mapHeight can't be null."
     }      
-    if (this._objectDescriptors === null) {
+    if (this.objectDescriptors === null) {
       throw "IsoMap's object descriptors can't be null."
     }
-    const size = this._mapWidth * this._mapHeight;
-    for (let y = 0; y < this._mapHeight; ++y) {
-      for (let x = 0; x <  this._mapWidth; ++x) {
-        let data = this._mapData[x + y * this._mapWidth];
+    const size = this.mapWidth * this.mapHeight;
+    for (let y = 0; y < this.mapHeight; ++y) {
+      for (let x = 0; x <  this.mapWidth; ++x) {
+        let data = this.mapData[x + y * this.mapWidth];
         const tileID = data[0];
         if (tileID >= 0) {
-          this.addChild(new IsoTile(this, x, y, data[1], this._tiles[tileID]));
+          this.addChild(new IsoTile(this, x, y, data[1], this.tiles[tileID]));
         }
       }
     }  
-    for (let object of this._objects)  {
+    for (let object of this.objects)  {
       let h = this.tileAt(object.x, object.y)[1];
-      this.addChild(new IsoObjectSprite(this, object, h, this._objectDescriptors[object.id]));
+      this.addChild(new IsoObjectSprite(this, object, h, this.objectDescriptors[object.id]));
     }
-    for (let character of this._characters) {
+    for (let character of this.characters) {
       this.addChild(new IsoCharacterSprite(this, character));
     }
   }
 
   tileAt(x: number, y: number) {
-    if (x < 0 || x >= (this._mapWidth as number) || y < 0 || y >= (this._mapHeight as number)) {
+    if (x < 0 || x >= (this.mapWidth as number) || y < 0 || y >= (this.mapHeight as number)) {
       return [-1, -1];
     }
-    return (this._mapData && this._mapData[x + y * (this._mapWidth as number)]) || [-1, -1];
+    return (this.mapData && this.mapData[x + y * (this.mapWidth as number)]) || [-1, -1];
   }
 
   get globalAttributes() : IsoMap.Attributes | null {
-    return this._options;
+    return this.options;
   }
 
   refreshOrder() {

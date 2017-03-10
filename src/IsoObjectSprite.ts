@@ -2,6 +2,8 @@ import * as PIXI from 'pixi.js';
 import IsoMap    from './IsoMap';
 import IsoObject from './IsoObject';
 
+const EMPTY_TEXTURE = new PIXI.BaseTexture();
+
 class IsoObjectSprite extends PIXI.Sprite {
 
   private _z                : number;
@@ -14,7 +16,7 @@ class IsoObjectSprite extends PIXI.Sprite {
     super();
     this._tilemap = tilemap;
     this._tileHeight = tileHeight;
-    this.texture  = new PIXI.Texture(tilemap.textures[obj.tileset], obj.frame); 
+    this.texture  = new PIXI.Texture(tilemap.textures ? tilemap.textures[obj.tileset] : EMPTY_TEXTURE, obj.frame); 
     this.anchor.x = 0.5;
     this.anchor.y = 1;
     this._object  = obj;
@@ -34,9 +36,8 @@ class IsoObjectSprite extends PIXI.Sprite {
 
   private _updatePosition() {
     const ga = this._tilemap.globalAttributes as IsoMap.Attributes;
-    const camera = this._tilemap.camera;
-    this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2 + camera.x;
-    this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight + camera.y;
+    this.x = (this._tile.x - this._tile.y) * ga.tileWidth / 2;
+    this.y = (this._tile.x + this._tile.y) * ga.tileWidth / 4 - ga.heightSize * this._tileHeight ;
 
   }
 
