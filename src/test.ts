@@ -61,14 +61,23 @@ class TestCharacter extends IsoCharacter {
 }
 
 const CHARACTERS : IsoCharacter[] = [
-  new TestCharacter().moveTo(10, 0).face(IsoCharacter.Direction.UP),
-  new TestCharacter().moveTo(0, 1).face(IsoCharacter.Direction.LEFT),  
-  new TestCharacter().moveTo(1, 0).face(IsoCharacter.Direction.DOWN),
-  new TestCharacter().moveTo(3, 2).face(IsoCharacter.Direction.RIGHT),
-  new TestCharacter().moveTo(3, 3).face(IsoCharacter.Direction.RIGHT),
-  new TestCharacter().moveTo(4, 5).face(IsoCharacter.Direction.LEFT),
-  new TestCharacter().moveTo(1, 11).face(IsoCharacter.Direction.RIGHT),
-  new TestCharacter().moveTo(0, 10).face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(10, 0, 4).face(IsoCharacter.Direction.UP),
+  new TestCharacter().moveTo(0, 1,  7).face(IsoCharacter.Direction.LEFT),  
+  new TestCharacter().moveTo(1, 0,  7).face(IsoCharacter.Direction.DOWN),
+  new TestCharacter().moveTo(3, 2,  5).face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(3, 3,  6).face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(4, 5,  5).face(IsoCharacter.Direction.LEFT),
+  new TestCharacter().moveTo(1, 11, 0).face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(0, 10, 0)
+    .face(IsoCharacter.Direction.RIGHT)
+    .walk(IsoCharacter.Direction.RIGHT,  0, 1000)
+    .face(IsoCharacter.Direction.DOWN)
+    .walk(IsoCharacter.Direction.DOWN,  0, 1000)  
+    .face(IsoCharacter.Direction.LEFT)
+    .walk(IsoCharacter.Direction.LEFT, 0, 1000)      
+    .face(IsoCharacter.Direction.UP)
+    .walk(IsoCharacter.Direction.UP,    0, 1000)
+    .face(IsoCharacter.Direction.RIGHT)
 ];
 
 const OBJECT_DESCRIPTORS : IsoObject[] = [

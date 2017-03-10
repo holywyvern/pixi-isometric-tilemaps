@@ -10956,9 +10956,9 @@ var IsoCharacter = (function (_super) {
         _this.frameWidth = frameWidth;
         _this.frame = 0;
         _this.direction = IsoCharacter.Direction.UP;
-        _this._x = 0;
-        _this._y = 0;
-        _this._height = 0;
+        _this.mapX = 0;
+        _this.mapY = 0;
+        _this.mapH = 0;
         _this._queue = [];
         _this.opacity = 1;
         _this._animation = null;
@@ -10966,51 +10966,21 @@ var IsoCharacter = (function (_super) {
         _this.scale = new PIXI.Point(1, 1);
         return _this;
     }
-    Object.defineProperty(IsoCharacter.prototype, "z", {
-        get: function () {
-            return this._z;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(IsoCharacter.prototype, "x", {
-        get: function () {
-            return this._realX;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(IsoCharacter.prototype, "y", {
-        get: function () {
-            return this._realY;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(IsoCharacter.prototype, "mapX", {
-        get: function () {
-            return this._x;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(IsoCharacter.prototype, "mapY", {
-        get: function () {
-            return this._y;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(IsoCharacter.prototype, "height", {
         get: function () {
-            return this._height;
+            return this.h;
+        },
+        set: function (value) {
+            this.h = value;
         },
         enumerable: true,
         configurable: true
     });
-    IsoCharacter.prototype.moveTo = function (x, y) {
-        this._x = x;
-        this._y = y;
+    IsoCharacter.prototype.moveTo = function (x, y, h) {
+        if (h === void 0) { h = 0; }
+        this.mapX = x;
+        this.mapY = y;
+        this.mapH = h;
         this._refreshCoordinates();
         return this;
     };
@@ -11031,16 +11001,17 @@ var IsoCharacter = (function (_super) {
         this._queue.push(new IsoCharacter.FaceAction(direction));
         return this;
     };
-    IsoCharacter.prototype.walk = function (direction, speed) {
-        this._queue.push(new IsoCharacter.WalkAction(direction, speed));
+    IsoCharacter.prototype.walk = function (direction, newHeight, duration) {
+        this._queue.push(new IsoCharacter.WalkAction(this, direction, newHeight, duration));
         return this;
     };
-    IsoCharacter.prototype.jump = function (direction, speed, heightDifference) {
-        this._queue.push(new IsoCharacter.JumpAction(direction, speed, heightDifference));
+    IsoCharacter.prototype.jump = function (direction, duration, newHeight) {
+        this._queue.push(new IsoCharacter.JumpAction(direction, newHeight, duration));
     };
     IsoCharacter.prototype._refreshCoordinates = function () {
-        this._realX = (this._x - this._y) * this._attributes.tileWidth / 2;
-        this._realY = (this._x + this._y) * this._attributes.tileWidth / 4;
+        this.x = (this.mapX - this.mapY) * this._attributes.tileWidth / 2;
+        this.y = (this.mapX + this.mapY) * this._attributes.tileWidth / 4;
+        this.h = (this.mapH) * this._attributes.heightSize;
     };
     IsoCharacter.prototype._updateAnimation = function (delta) {
         if (this._animation) {
@@ -11123,22 +11094,73 @@ var IsoCharacter = (function (_super) {
     }());
     IsoCharacter.FaceAction = FaceAction;
     var WalkAction = (function () {
-        function WalkAction(direction, speed) {
+        function WalkAction(character, direction, newHeight, duration) {
             this.direction = direction;
-            this.speed = speed;
+            this.duration = duration;
+            this.newHeight = newHeight;
+            this._targetSet = false;
         }
+        WalkAction.prototype._setTarget = function (character) {
+            var x = 0, y = 0;
+            switch (this.direction) {
+                case Direction.UP:
+                    x = character.mapX - 1;
+                    y = character.mapY;
+                    break;
+                case Direction.DOWN:
+                    x = character.mapX + 1;
+                    y = character.mapY;
+                    break;
+                case Direction.LEFT:
+                    x = character.mapX;
+                    y = character.mapY + 1;
+                    break;
+                case Direction.RIGHT:
+                    x = character.mapX;
+                    y = character.mapY - 1;
+                    break;
+                default:
+                    break;
+            }
+            this._newMapX = x;
+            this._newMapY = y;
+            this._targetX = (x - y) * character._attributes.tileWidth / 2;
+            this._targetY = (x + y) * character._attributes.tileWidth / 4;
+            this._targetH = this.newHeight * character._attributes.heightSize;
+            this._diffX = (this._targetX - character.x) / this.duration;
+            this._diffY = (this._targetY - character.y) / this.duration;
+            this._diffH = (this._targetH - character.h) / this.duration;
+            this._targetSet = true;
+        };
         WalkAction.prototype.update = function (delta, character) {
+            if (!this._targetSet) {
+                this._setTarget(character);
+            }
+            if (this.duration > 0) {
+                character.x += this._diffX * delta;
+                character.y += this._diffY * delta;
+                character.h += this._diffH * delta;
+                this.duration -= delta;
+                if (this.isDone()) {
+                    console.log('done!');
+                    character.x = this._targetX;
+                    character.y = this._targetY;
+                    character.h = this._targetH;
+                    character.mapX = this._newMapX;
+                    character.mapY = this._newMapY;
+                }
+            }
         };
         WalkAction.prototype.isDone = function () {
-            return false;
+            return this.duration <= 0;
         };
         return WalkAction;
     }());
     IsoCharacter.WalkAction = WalkAction;
     var JumpAction = (function () {
-        function JumpAction(direction, speed, heightDifference) {
+        function JumpAction(direction, duration, heightDifference) {
             this.direction = direction;
-            this.speed = speed;
+            this.duration = duration;
             this.heightDifference = heightDifference;
         }
         JumpAction.prototype.update = function (delta, character) {
@@ -11151,6 +11173,7 @@ var IsoCharacter = (function (_super) {
     IsoCharacter.JumpAction = JumpAction;
     var Direction;
     (function (Direction) {
+        Direction[Direction["CENTER"] = 5] = "CENTER";
         Direction[Direction["UP"] = 2] = "UP";
         Direction[Direction["DOWN"] = 4] = "DOWN";
         Direction[Direction["LEFT"] = 6] = "LEFT";
@@ -39633,7 +39656,7 @@ var IsoCharacterSprite = (function (_super) {
     IsoCharacterSprite.prototype._updateZ = function () {
         var character = this._character;
         var ga = this._tilemap.globalAttributes;
-        var z = character.y + 1;
+        var z = character.y + ga.tileWidth / 4 - 1;
         if (z !== this.z) {
             this.z = z;
             this._tilemap.refreshOrder();
@@ -39670,7 +39693,7 @@ var IsoCharacterSprite = (function (_super) {
             this.texture.frame = spriteFrame;
         }
         this.position.x = this._character.x;
-        this.position.y = this._character.y - ga.heightSize * this._tilemap.tileAt(this._character.mapX, this._character.mapY)[1] - this._character.height;
+        this.position.y = this._character.y - this._character.h;
     };
     IsoCharacterSprite.prototype.update = function (delta) {
         this._character.update(delta);
@@ -39713,7 +39736,7 @@ var IsoObjectSprite = (function (_super) {
         _this._object = obj;
         _this._tile = tile;
         var ga = _this._tilemap.globalAttributes;
-        _this.z = (tile.x + tile.y) * ga.tileWidth / 4 + 1;
+        _this.z = (tile.x + tile.y) * ga.tileWidth / 4 + ga.tileWidth / 4 - 1;
         return _this;
     }
     Object.defineProperty(IsoObjectSprite.prototype, "z", {
@@ -39764,7 +39787,8 @@ var IsoTile = (function (_super) {
     function IsoTile(tilemap, x, y, height, attributes) {
         var _this = _super.call(this) || this;
         _this._tilemap = tilemap;
-        _this._globalAttributes = tilemap.globalAttributes;
+        var ga = tilemap.globalAttributes;
+        _this._globalAttributes = ga;
         _this._tileX = x;
         _this._tileY = y;
         _this._tileHeight = height;
@@ -40780,14 +40804,23 @@ var TestCharacter = (function (_super) {
     return TestCharacter;
 }(IsoCharacter_1.default));
 var CHARACTERS = [
-    new TestCharacter().moveTo(10, 0).face(IsoCharacter_1.default.Direction.UP),
-    new TestCharacter().moveTo(0, 1).face(IsoCharacter_1.default.Direction.LEFT),
-    new TestCharacter().moveTo(1, 0).face(IsoCharacter_1.default.Direction.DOWN),
-    new TestCharacter().moveTo(3, 2).face(IsoCharacter_1.default.Direction.RIGHT),
-    new TestCharacter().moveTo(3, 3).face(IsoCharacter_1.default.Direction.RIGHT),
-    new TestCharacter().moveTo(4, 5).face(IsoCharacter_1.default.Direction.LEFT),
-    new TestCharacter().moveTo(1, 11).face(IsoCharacter_1.default.Direction.RIGHT),
-    new TestCharacter().moveTo(0, 10).face(IsoCharacter_1.default.Direction.RIGHT),
+    new TestCharacter().moveTo(10, 0, 4).face(IsoCharacter_1.default.Direction.UP),
+    new TestCharacter().moveTo(0, 1, 7).face(IsoCharacter_1.default.Direction.LEFT),
+    new TestCharacter().moveTo(1, 0, 7).face(IsoCharacter_1.default.Direction.DOWN),
+    new TestCharacter().moveTo(3, 2, 5).face(IsoCharacter_1.default.Direction.RIGHT),
+    new TestCharacter().moveTo(3, 3, 6).face(IsoCharacter_1.default.Direction.RIGHT),
+    new TestCharacter().moveTo(4, 5, 5).face(IsoCharacter_1.default.Direction.LEFT),
+    new TestCharacter().moveTo(1, 11, 0).face(IsoCharacter_1.default.Direction.RIGHT),
+    new TestCharacter().moveTo(0, 10, 0)
+        .face(IsoCharacter_1.default.Direction.RIGHT)
+        .walk(IsoCharacter_1.default.Direction.RIGHT, 0, 1000)
+        .face(IsoCharacter_1.default.Direction.DOWN)
+        .walk(IsoCharacter_1.default.Direction.DOWN, 0, 1000)
+        .face(IsoCharacter_1.default.Direction.LEFT)
+        .walk(IsoCharacter_1.default.Direction.LEFT, 0, 1000)
+        .face(IsoCharacter_1.default.Direction.UP)
+        .walk(IsoCharacter_1.default.Direction.UP, 0, 1000)
+        .face(IsoCharacter_1.default.Direction.RIGHT)
 ];
 var OBJECT_DESCRIPTORS = [
     { tileset: 0, frame: new PIXI.Rectangle(0, 80, 64, 80), type: "tree" },

@@ -1,16 +1,16 @@
 import * as PIXI from 'pixi.js';
 import IsoMap from './IsoMap';
 declare abstract class IsoCharacter extends PIXI.Container {
-    protected _x: number;
-    protected _y: number;
-    protected _height: number;
-    protected _realX: number;
-    protected _realY: number;
-    protected _z: number;
     private _queue;
     private _animation;
     private _executing;
-    private _attributes;
+    _attributes: IsoMap.Attributes;
+    x: number;
+    y: number;
+    h: number;
+    mapX: number;
+    mapY: number;
+    mapH: number;
     scale: PIXI.Point;
     direction: IsoCharacter.Direction;
     frame: number;
@@ -18,17 +18,12 @@ declare abstract class IsoCharacter extends PIXI.Container {
     opacity: number;
     texture: PIXI.BaseTexture | null;
     constructor(attributes: IsoMap.Attributes, frameWidth: number, texture?: PIXI.BaseTexture | null);
-    readonly z: number;
-    readonly x: number;
-    readonly y: number;
-    readonly mapX: number;
-    readonly mapY: number;
-    readonly height: number;
-    moveTo(x: number, y: number): this;
+    height: number;
+    moveTo(x: number, y: number, h?: number): this;
     animate(frames: number[], delay: number, loops?: number, wait?: boolean): this;
     face(direction: IsoCharacter.Direction): this;
-    walk(direction: IsoCharacter.Direction, speed: number): this;
-    jump(direction: IsoCharacter.Direction, speed: number, heightDifference: number): void;
+    walk(direction: IsoCharacter.Direction, newHeight: number, duration: number): this;
+    jump(direction: IsoCharacter.Direction, duration: number, newHeight: number): void;
     private _refreshCoordinates();
     private _updateAnimation(delta);
     private _updateQueue(delta);
@@ -66,20 +61,32 @@ declare module IsoCharacter {
     }
     class WalkAction implements Action {
         direction: Direction;
-        speed: number;
-        constructor(direction: Direction, speed: number);
+        duration: number;
+        newHeight: number;
+        private _targetX;
+        private _targetY;
+        private _targetH;
+        private _diffX;
+        private _diffY;
+        private _diffH;
+        private _newMapX;
+        private _newMapY;
+        private _targetSet;
+        constructor(character: IsoCharacter, direction: Direction, newHeight: number, duration: number);
+        private _setTarget(character);
         update(delta: number, character: IsoCharacter): void;
         isDone(): boolean;
     }
     class JumpAction implements Action {
         direction: Direction;
         heightDifference: number;
-        speed: number;
-        constructor(direction: Direction, speed: number, heightDifference: number);
+        duration: number;
+        constructor(direction: Direction, duration: number, heightDifference: number);
         update(delta: number, character: IsoCharacter): void;
         isDone(): boolean;
     }
     enum Direction {
+        CENTER = 5,
         UP = 2,
         DOWN = 4,
         LEFT = 6,

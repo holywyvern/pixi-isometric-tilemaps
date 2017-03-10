@@ -37,7 +37,7 @@ class IsoCharacterSprite extends PIXI.Sprite {
   private _updateZ() {
     const character = this._character;
     const ga = (this._tilemap.globalAttributes as IsoMap.Attributes);
-    const z = character.y + 1;
+    const z = character.y + ga.tileWidth / 4 - 1; 
     if (z !== this.z) {
       this.z = z;
       this._tilemap.refreshOrder();
@@ -78,7 +78,7 @@ class IsoCharacterSprite extends PIXI.Sprite {
     } 
 
     this.position.x = this._character.x;
-    this.position.y = this._character.y  - ga.heightSize * this._tilemap.tileAt(this._character.mapX, this._character.mapY)[1] - this._character.height;
+    this.position.y = this._character.y - this._character.h;
 
   }
 

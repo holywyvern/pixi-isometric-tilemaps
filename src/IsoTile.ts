@@ -28,7 +28,8 @@ class IsoTile extends PIXI.Container {
   constructor(tilemap : IsoMap, x: number, y: number, height: number, attributes: IsoTile.Attributes) {
     super();
     this._tilemap = tilemap;
-    this._globalAttributes = tilemap.globalAttributes as IsoMap.Attributes;
+    const ga = tilemap.globalAttributes as IsoMap.Attributes;
+    this._globalAttributes = ga;
     this._tileX    = x;
     this._tileY    = y;
     this._tileHeight = height;

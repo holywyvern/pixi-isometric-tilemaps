@@ -3,19 +3,22 @@ import * as PIXI from 'pixi.js';
 import IsoMap    from './IsoMap';
 
 abstract class IsoCharacter extends PIXI.Container {
-
-    protected _x         : number;
-    protected _y         : number;
-    protected _height    : number;
-    protected _realX     : number;
-    protected _realY     : number;    
-    protected _z         : number;
+ 
     private   _queue     : IsoCharacter.Action[];
     private _animation   : IsoCharacter.AnimationAction|null;
     private _executing   : boolean;
-    private _attributes  : IsoMap.Attributes;
     
-    scale        : PIXI.Point;
+    _attributes  : IsoMap.Attributes;
+    
+    x           : number;
+    y           : number;
+    h           : number;
+
+    mapX        : number;
+    mapY        : number;
+    mapH        : number;
+
+    scale       : PIXI.Point;
     direction   : IsoCharacter.Direction;
     frame       : number;
     frameWidth  : number;
@@ -29,9 +32,9 @@ abstract class IsoCharacter extends PIXI.Container {
         this.frameWidth  = frameWidth;
         this.frame       = 0;
         this.direction   = IsoCharacter.Direction.UP;
-        this._x = 0;
-        this._y = 0;
-        this._height = 0;
+        this.mapX  = 0;
+        this.mapY  = 0;
+        this.mapH  = 0;
         this._queue = [];
         this.opacity   = 1;
         this._animation = null;
@@ -39,33 +42,19 @@ abstract class IsoCharacter extends PIXI.Container {
         this.scale = new PIXI.Point(1, 1);
     }
 
-    get z() {
-        return this._z;
-    }
-
-    get x() {
-        return this._realX;
-    }
-
-    get y() {
-        return this._realY;
-    }
-
-    get mapX() {
-        return this._x;
-    }
-
-    get mapY() {
-        return this._y;
-    }
 
     get height() {
-        return this._height;
+        return this.h;
     }
 
-    moveTo(x: number, y: number) {
-        this._x = x;
-        this._y = y;
+    set height(value) {
+        this.h = value;
+    }
+
+    moveTo(x: number, y: number, h: number=0) {
+        this.mapX = x;
+        this.mapY = y;
+        this.mapH = h;
         this._refreshCoordinates();
         return this;
     }
@@ -92,25 +81,28 @@ abstract class IsoCharacter extends PIXI.Container {
         return this;
     }
 
-    walk(direction: IsoCharacter.Direction, speed: number) {
+    walk(direction: IsoCharacter.Direction, newHeight: number, duration: number) {
         this._queue.push(new IsoCharacter.WalkAction(
+            this,
             direction, 
-            speed 
+            newHeight,
+            duration,
         ));
         return this;
     }
 
-    jump(direction: IsoCharacter.Direction, speed: number, heightDifference: number) {
+    jump(direction: IsoCharacter.Direction, duration: number, newHeight: number) {
         this._queue.push(new IsoCharacter.JumpAction(  
             direction, 
-            speed, 
-            heightDifference 
+            newHeight,
+            duration, 
         ));
     }
 
     private _refreshCoordinates() {
-        this._realX = (this._x - this._y) * this._attributes.tileWidth / 2;
-        this._realY = (this._x + this._y) * this._attributes.tileWidth / 4;        
+        this.x = (this.mapX - this.mapY) * this._attributes.tileWidth / 2;
+        this.y = (this.mapX + this.mapY) * this._attributes.tileWidth / 4;      
+        this.h = (this.mapH) * this._attributes.heightSize;
     }
 
     private _updateAnimation(delta: number) {
@@ -227,19 +219,81 @@ module IsoCharacter {
 
     export class WalkAction implements Action {
         direction : Direction;
-        speed     : number;
+        duration  : number;
+        newHeight : number;
 
-        constructor(direction: Direction, speed: number) {
+        private _targetX   : number;
+        private _targetY   : number;
+        private _targetH   : number;
+        private _diffX     : number;
+        private _diffY     : number;
+        private _diffH     : number;        
+        private _newMapX   : number;
+        private _newMapY   : number;
+        private _targetSet : boolean;
+
+        constructor(character: IsoCharacter, direction: Direction, newHeight: number, duration: number) {
             this.direction = direction;
-            this.speed     = speed;
+            this.duration  = duration;
+            this.newHeight = newHeight;
+            this._targetSet = false;
+        }
+
+        private _setTarget(character : IsoCharacter) {
+            let x = 0, y = 0;
+            switch (this.direction) {
+                case Direction.UP:
+                    x = character.mapX - 1;
+                    y = character.mapY;
+                    break;
+                case Direction.DOWN:
+                    x = character.mapX + 1;
+                    y = character.mapY;               
+                    break;
+                case Direction.LEFT:
+                    x = character.mapX;
+                    y = character.mapY + 1;                
+                    break;
+                case Direction.RIGHT:
+                    x = character.mapX;
+                    y = character.mapY - 1;                  
+                    break;
+                default:
+                    break;
+            }
+            this._newMapX = x;
+            this._newMapY = y;
+            this._targetX = (x - y) * character._attributes.tileWidth / 2;
+            this._targetY = (x + y) * character._attributes.tileWidth / 4;  
+            this._targetH = this.newHeight * character._attributes.heightSize;
+            this._diffX   = (this._targetX - character.x) / this.duration; 
+            this._diffY   = (this._targetY - character.y) / this.duration; 
+            this._diffH   = (this._targetH - character.h) / this.duration; 
+            this._targetSet = true;
         }
 
         update(delta: number, character: IsoCharacter) {
-            
+            if (!this._targetSet) {
+                this._setTarget(character);
+            }
+            if (this.duration > 0) {
+                character.x += this._diffX * delta;
+                character.y += this._diffY * delta;
+                character.h += this._diffH * delta;
+                this.duration -= delta;
+                if (this.isDone()) {
+                    console.log('done!')
+                    character.x    = this._targetX;
+                    character.y    = this._targetY;
+                    character.h    = this._targetH;  
+                    character.mapX = this._newMapX;
+                    character.mapY = this._newMapY;
+                }
+            }
         }
 
         isDone() {
-            return false;
+            return this.duration <= 0;
         }
 
     }
@@ -247,11 +301,11 @@ module IsoCharacter {
     export class JumpAction implements Action {
         direction        : Direction;
         heightDifference : number;
-        speed            : number;
+        duration         : number;
 
-        constructor(direction: Direction, speed: number, heightDifference: number) {
+        constructor(direction: Direction, duration: number, heightDifference: number) {
             this.direction        = direction;
-            this.speed            = speed;
+            this.duration         = duration;
             this.heightDifference = heightDifference;
         }
 
@@ -267,10 +321,11 @@ module IsoCharacter {
 
 
     export enum Direction {
-        UP    = 2,
-        DOWN  = 4,
-        LEFT  = 6,
-        RIGHT = 8
+        CENTER = 5,
+        UP     = 2,
+        DOWN   = 4,
+        LEFT   = 6,
+        RIGHT  = 8
     }
 
 }
