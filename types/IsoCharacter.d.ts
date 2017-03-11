@@ -8,6 +8,7 @@ declare abstract class IsoCharacter extends PIXI.Container {
     x: number;
     y: number;
     h: number;
+    j: number;
     mapX: number;
     mapY: number;
     mapH: number;
@@ -23,7 +24,7 @@ declare abstract class IsoCharacter extends PIXI.Container {
     animate(frames: number[], delay: number, loops?: number, wait?: boolean): this;
     face(direction: IsoCharacter.Direction): this;
     walk(direction: IsoCharacter.Direction, newHeight: number, duration: number): this;
-    jump(direction: IsoCharacter.Direction, newHeight: number, jumpheight: number, duration: number): void;
+    jump(direction: IsoCharacter.Direction, newHeight: number, jumpheight: number, duration: number): this;
     private _refreshCoordinates();
     private _updateAnimation(delta);
     private _updateQueue(delta);
@@ -79,12 +80,12 @@ declare module IsoCharacter {
         isDone(): boolean;
     }
     class JumpAction extends WalkAction {
-        jumpheight: number;
-        constructor(direction: Direction, newHeight: number, jumpheight: number, duration: number);
-        private _updateLowerJump(delta, character);
-        private _updateUpperJump(delta, character);
+        jumpHeight: number;
+        totalDuration: number;
+        private _angle;
+        private _angleInc;
+        constructor(direction: Direction, newHeight: number, jumpHeight: number, duration: number);
         update(delta: number, character: IsoCharacter): void;
-        isDone(): boolean;
     }
     enum Direction {
         CENTER = 5,

@@ -13,6 +13,7 @@ abstract class IsoCharacter extends PIXI.Container {
     x           : number;
     y           : number;
     h           : number;
+    j           : number;
 
     mapX        : number;
     mapY        : number;
@@ -55,6 +56,7 @@ abstract class IsoCharacter extends PIXI.Container {
         this.mapX = x;
         this.mapY = y;
         this.mapH = h;
+        this.j    = 0;
         this._refreshCoordinates();
         return this;
     }
@@ -97,6 +99,7 @@ abstract class IsoCharacter extends PIXI.Container {
             jumpheight,
             duration, 
         ));
+        return this;
     }
 
     private _refreshCoordinates() {
@@ -303,19 +306,18 @@ module IsoCharacter {
 
     export class JumpAction extends WalkAction {
 
-        jumpheight : number;
+        jumpHeight    : number;
+        totalDuration : number;
 
-        constructor(direction: Direction, newHeight: number, jumpheight: number, duration: number) {
+        private _angle    : number;
+        private _angleInc : number;
+
+        constructor(direction: Direction, newHeight: number, jumpHeight: number, duration: number) {
             super(direction, newHeight, duration);
-            this.jumpheight = jumpheight;
-        }
-
-        private _updateLowerJump(delta: number, character: IsoCharacter) {
-
-        }
-
-        private _updateUpperJump(delta: number, character: IsoCharacter) {
-
+            this.totalDuration = duration;
+            this.jumpHeight    = jumpHeight;
+            this._angle        = 0;
+            this._angleInc     = Math.PI / (duration - 1);
         }
 
         update(delta: number, character: IsoCharacter) {
@@ -323,18 +325,14 @@ module IsoCharacter {
                 this._setTarget(character);
             }            
             if (this.duration) {
-                if (this._diffH < 0) {
-                    this._updateLowerJump(delta, character);
-                } else {
-                    this._updateUpperJump(delta, character);
-                }
+                character.x += this._diffX * delta;
+                character.y += this._diffY * delta;
+                character.h += this._diffH * delta; 
+                character.j  = Math.sin(this._angle) * this.jumpHeight;
                 this.duration -= delta;
+                this._angle += this._angleInc * delta;
                 this._endWhenDone(character);            
             }
-        }
-
-        isDone() {
-            return false;
         }
 
     }

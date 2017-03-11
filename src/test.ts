@@ -66,7 +66,6 @@ const CHARACTERS : IsoCharacter[] = [
   new TestCharacter().moveTo(1, 0,  7).face(IsoCharacter.Direction.DOWN),
   new TestCharacter().moveTo(3, 2,  5).face(IsoCharacter.Direction.RIGHT),
   new TestCharacter().moveTo(3, 3,  6).face(IsoCharacter.Direction.RIGHT),
-  new TestCharacter().moveTo(4, 5,  5).face(IsoCharacter.Direction.LEFT),
   new TestCharacter().moveTo(1, 11, 0).face(IsoCharacter.Direction.RIGHT),
   new TestCharacter().moveTo(0, 10, 0)
     .face(IsoCharacter.Direction.RIGHT)
@@ -77,7 +76,13 @@ const CHARACTERS : IsoCharacter[] = [
     .walk(IsoCharacter.Direction.LEFT, 0, 1000)      
     .face(IsoCharacter.Direction.UP)
     .walk(IsoCharacter.Direction.UP,    0, 1000)
+    .face(IsoCharacter.Direction.RIGHT),
+  new TestCharacter().moveTo(4, 6,  5)
+    .face(IsoCharacter.Direction.LEFT)
+    .jump(IsoCharacter.Direction.LEFT, 0, 64, 1000),
+  new TestCharacter().moveTo(3, 7,  1)
     .face(IsoCharacter.Direction.RIGHT)
+    .jump(IsoCharacter.Direction.RIGHT, 5, 48, 1000),    
 ];
 
 const OBJECT_DESCRIPTORS : IsoObject[] = [

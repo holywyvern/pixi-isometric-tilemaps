@@ -10981,6 +10981,7 @@ var IsoCharacter = (function (_super) {
         this.mapX = x;
         this.mapY = y;
         this.mapH = h;
+        this.j = 0;
         this._refreshCoordinates();
         return this;
     };
@@ -11007,6 +11008,7 @@ var IsoCharacter = (function (_super) {
     };
     IsoCharacter.prototype.jump = function (direction, newHeight, jumpheight, duration) {
         this._queue.push(new IsoCharacter.JumpAction(direction, newHeight, jumpheight, duration));
+        return this;
     };
     IsoCharacter.prototype._refreshCoordinates = function () {
         this.x = (this.mapX - this.mapY) * this._attributes.tileWidth / 2;
@@ -11161,32 +11163,27 @@ var IsoCharacter = (function (_super) {
     IsoCharacter.WalkAction = WalkAction;
     var JumpAction = (function (_super) {
         __extends(JumpAction, _super);
-        function JumpAction(direction, newHeight, jumpheight, duration) {
+        function JumpAction(direction, newHeight, jumpHeight, duration) {
             var _this = _super.call(this, direction, newHeight, duration) || this;
-            _this.jumpheight = jumpheight;
+            _this.totalDuration = duration;
+            _this.jumpHeight = jumpHeight;
+            _this._angle = 0;
+            _this._angleInc = Math.PI / (duration - 1);
             return _this;
         }
-        JumpAction.prototype._updateLowerJump = function (delta, character) {
-        };
-        JumpAction.prototype._updateUpperJump = function (delta, character) {
-        };
         JumpAction.prototype.update = function (delta, character) {
             if (!this._targetSet) {
                 this._setTarget(character);
             }
             if (this.duration) {
-                if (this._diffH < 0) {
-                    this._updateLowerJump(delta, character);
-                }
-                else {
-                    this._updateUpperJump(delta, character);
-                }
+                character.x += this._diffX * delta;
+                character.y += this._diffY * delta;
+                character.h += this._diffH * delta;
+                character.j = Math.sin(this._angle) * this.jumpHeight;
                 this.duration -= delta;
+                this._angle += this._angleInc * delta;
                 this._endWhenDone(character);
             }
-        };
-        JumpAction.prototype.isDone = function () {
-            return false;
         };
         return JumpAction;
     }(WalkAction));
@@ -39713,7 +39710,7 @@ var IsoCharacterSprite = (function (_super) {
             this.texture.frame = spriteFrame;
         }
         this.position.x = this._character.x;
-        this.position.y = this._character.y - this._character.h;
+        this.position.y = this._character.y - this._character.h - this._character.j;
     };
     IsoCharacterSprite.prototype.update = function (delta) {
         this._character.update(delta);
@@ -40829,7 +40826,6 @@ var CHARACTERS = [
     new TestCharacter().moveTo(1, 0, 7).face(IsoCharacter_1.default.Direction.DOWN),
     new TestCharacter().moveTo(3, 2, 5).face(IsoCharacter_1.default.Direction.RIGHT),
     new TestCharacter().moveTo(3, 3, 6).face(IsoCharacter_1.default.Direction.RIGHT),
-    new TestCharacter().moveTo(4, 5, 5).face(IsoCharacter_1.default.Direction.LEFT),
     new TestCharacter().moveTo(1, 11, 0).face(IsoCharacter_1.default.Direction.RIGHT),
     new TestCharacter().moveTo(0, 10, 0)
         .face(IsoCharacter_1.default.Direction.RIGHT)
@@ -40840,7 +40836,13 @@ var CHARACTERS = [
         .walk(IsoCharacter_1.default.Direction.LEFT, 0, 1000)
         .face(IsoCharacter_1.default.Direction.UP)
         .walk(IsoCharacter_1.default.Direction.UP, 0, 1000)
+        .face(IsoCharacter_1.default.Direction.RIGHT),
+    new TestCharacter().moveTo(4, 6, 5)
+        .face(IsoCharacter_1.default.Direction.LEFT)
+        .jump(IsoCharacter_1.default.Direction.LEFT, 0, 64, 1000),
+    new TestCharacter().moveTo(3, 7, 1)
         .face(IsoCharacter_1.default.Direction.RIGHT)
+        .jump(IsoCharacter_1.default.Direction.RIGHT, 5, 48, 1000),
 ];
 var OBJECT_DESCRIPTORS = [
     { tileset: 0, frame: new PIXI.Rectangle(0, 80, 64, 80), type: "tree" },
