@@ -9,7 +9,8 @@ declare class IsoMap extends PIXI.Container {
     textures: null | PIXI.BaseTexture[];
     mapWidth: null | number;
     mapHeight: null | number;
-    mapData: null | number[][];
+    mapData: null | number[];
+    heightData: null | number[];
     objects: IsoMap.Instance[];
     objectDescriptors: null | IsoObject[];
     characters: IsoCharacter[];
@@ -18,7 +19,9 @@ declare class IsoMap extends PIXI.Container {
     readonly camera: PIXI.Point;
     clean(): void;
     build(): void;
-    tileAt(x: number, y: number): number[];
+    heightAt(x: number, y: number): number;
+    tileAt(x: number, y: number): number;
+    private _valueAt(array, x, y);
     readonly globalAttributes: IsoMap.Attributes | null;
     refreshOrder(): void;
     update(delta: number): void;

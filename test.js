@@ -19708,6 +19708,7 @@ var IsoMap = (function (_super) {
         this.tiles = null;
         this.textures = null;
         this.mapData = null;
+        this.heightData = null;
         this.mapWidth = null;
         this.mapHeight = null;
     };
@@ -19734,19 +19735,23 @@ var IsoMap = (function (_super) {
         if (this.objectDescriptors === null) {
             throw "IsoMap's object descriptors can't be null.";
         }
+        if (this.heightData === null) {
+            throw "IsoMap's height data cannot be null";
+        }
         var size = this.mapWidth * this.mapHeight;
         for (var y = 0; y < this.mapHeight; ++y) {
             for (var x = 0; x < this.mapWidth; ++x) {
-                var data = this.mapData[x + y * this.mapWidth];
-                var tileID = data[0];
+                var data = this.tileAt(x, y);
+                var h = this.heightAt(x, y);
+                var tileID = data;
                 if (tileID >= 0) {
-                    this.addChild(new IsoTile_1.default(this, x, y, data[1], this.tiles[tileID]));
+                    this.addChild(new IsoTile_1.default(this, x, y, h, this.tiles[tileID]));
                 }
             }
         }
         for (var _i = 0, _a = this.objects; _i < _a.length; _i++) {
             var object = _a[_i];
-            var h = this.tileAt(object.x, object.y)[1];
+            var h = this.heightAt(object.x, object.y);
             this.addChild(new IsoObjectSprite_1.default(this, object, h, this.objectDescriptors[object.id]));
         }
         for (var _b = 0, _c = this.characters; _b < _c.length; _b++) {
@@ -19754,11 +19759,17 @@ var IsoMap = (function (_super) {
             this.addChild(new IsoCharacterSprite_1.default(this, character));
         }
     };
+    IsoMap.prototype.heightAt = function (x, y) {
+        return this._valueAt(this.heightData, x, y);
+    };
     IsoMap.prototype.tileAt = function (x, y) {
+        return this._valueAt(this.mapData, x, y);
+    };
+    IsoMap.prototype._valueAt = function (array, x, y) {
         if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
-            return [-1, -1];
+            return -1;
         }
-        return (this.mapData && this.mapData[x + y * this.mapWidth]) || [-1, -1];
+        return array[x + y * this.mapWidth];
     };
     Object.defineProperty(IsoMap.prototype, "globalAttributes", {
         get: function () {
@@ -40035,8 +40046,8 @@ var IsoTile = (function (_super) {
         this.addChild(top);
     };
     IsoTile.prototype._calculateMaxHeight = function () {
-        var right = this._tileHeight - this._tilemap.tileAt(this._tileX + 1, this._tileY)[1];
-        var bottom = this._tileHeight - this._tilemap.tileAt(this._tileX, this._tileY + 1)[1];
+        var right = this._tileHeight - this._tilemap.heightAt(this._tileX + 1, this._tileY);
+        var bottom = this._tileHeight - this._tilemap.heightAt(this._tileX, this._tileY + 1);
         return [bottom, right];
     };
     IsoTile.prototype._buildSprites = function () {
@@ -40892,18 +40903,32 @@ var IsoMap_1 = __webpack_require__(93);
 var IsoCharacter_1 = __webpack_require__(38);
 __webpack_require__(91);
 var MAP_DATA = [
-    [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 7], [0, 7], [0, 7], [0, 4], [1, 3], [0, 4],
-    [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 7], [0, 7], [0, 7], [0, 4], [2, 3], [0, 4],
-    [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 7], [0, 7], [0, 6], [0, 4], [3, 3], [0, 4],
-    [0, 7], [0, 7], [0, 7], [0, 6], [0, 6], [0, 7], [0, 7], [0, 5], [0, 4], [4, 3], [0, 4],
-    [0, 7], [0, 7], [0, 7], [0, 6], [0, 6], [0, 6], [0, 6], [0, 5], [2, 3], [1, 3], [0, 4],
-    [0, 7], [0, 7], [0, 7], [0, 5], [0, 5], [0, 6], [0, 5], [0, 5], [3, 3], [0, 4], [0, 4],
-    [0, 7], [0, 6], [0, 6], [0, 5], [0, 5], [0, 5], [0, 5], [0, 2], [4, 1], [0, 2], [0, 1],
-    [0, 4], [0, 4], [0, 2], [0, 1], [0, 0], [0, 0], [0, 3], [0, 2], [1, 1], [0, 2], [0, 1],
-    [0, 3], [0, 2], [0, 2], [0, 0], [0, 0], [0, 1], [0, 2], [0, 2], [2, 1], [0, 2], [0, 1],
-    [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
-    [0, 0], [0, 0], [0, 0], [0, 0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
-    [0, 0], [0, 0], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1],
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0,
+    0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1,
+    0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1,
+    0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+];
+var HEIGHT_DATA = [
+    7, 7, 5, 5, 6, 7, 7, 7, 4, 3, 4,
+    7, 7, 5, 5, 6, 7, 7, 7, 4, 3, 4,
+    7, 7, 5, 5, 6, 7, 7, 6, 4, 3, 4,
+    7, 7, 7, 6, 6, 7, 7, 5, 4, 3, 4,
+    7, 7, 7, 6, 6, 6, 6, 5, 3, 3, 4,
+    7, 7, 7, 5, 5, 6, 5, 5, 3, 4, 4,
+    7, 6, 6, 5, 5, 5, 5, 2, 1, 2, 1,
+    4, 4, 2, 1, 0, 0, 3, 2, 1, 2, 1,
+    3, 2, 2, 0, 0, 1, 2, 2, 1, 2, 1,
+    0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1,
+    0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1,
+    0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ];
 var OBJECTS = [
     { x: 0, y: 0, id: 0 },
@@ -41013,6 +41038,7 @@ function setup() {
     tilemap.mapWidth = 11;
     tilemap.mapHeight = 12;
     tilemap.mapData = MAP_DATA;
+    tilemap.heightData = HEIGHT_DATA;
     tilemap.objects = OBJECTS;
     tilemap.characters = CHARACTERS;
     tilemap.x = 600;

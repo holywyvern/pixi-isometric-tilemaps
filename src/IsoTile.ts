@@ -151,8 +151,8 @@ class IsoTile extends PIXI.Container {
   }
 
   private _calculateMaxHeight() {
-    let right  = this._tileHeight - this._tilemap.tileAt(this._tileX + 1, this._tileY)[1];
-    let bottom = this._tileHeight - this._tilemap.tileAt(this._tileX, this._tileY + 1)[1];
+    let right  = this._tileHeight - this._tilemap.heightAt(this._tileX + 1, this._tileY);
+    let bottom = this._tileHeight - this._tilemap.heightAt(this._tileX, this._tileY + 1);
     return [bottom, right];
   }
 

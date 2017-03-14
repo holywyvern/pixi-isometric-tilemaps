@@ -14,7 +14,8 @@ class IsoMap extends PIXI.Container {
   textures          : null|PIXI.BaseTexture[];
   mapWidth          : null|number;
   mapHeight         : null|number;
-  mapData           : null|number[][];
+  mapData           : null|number[];
+  heightData        : null|number[];
   objects           : IsoMap.Instance[];
   objectDescriptors : null|IsoObject[];
   characters        : IsoCharacter[];
@@ -41,6 +42,7 @@ class IsoMap extends PIXI.Container {
     this.tiles             = null;
     this.textures          = null;
     this.mapData           = null;
+    this.heightData        = null;
     this.mapWidth          = null;
     this.mapHeight         = null;
   }
@@ -68,18 +70,22 @@ class IsoMap extends PIXI.Container {
     if (this.objectDescriptors === null) {
       throw "IsoMap's object descriptors can't be null."
     }
+    if (this.heightData === null) {
+      throw "IsoMap's height data cannot be null";
+    }
     const size = this.mapWidth * this.mapHeight;
     for (let y = 0; y < this.mapHeight; ++y) {
       for (let x = 0; x <  this.mapWidth; ++x) {
-        let data = this.mapData[x + y * this.mapWidth];
-        const tileID = data[0];
+        let data = this.tileAt(x, y);
+        let h    = this.heightAt(x, y);
+        const tileID = data;
         if (tileID >= 0) {
-          this.addChild(new IsoTile(this, x, y, data[1], this.tiles[tileID]));
+          this.addChild(new IsoTile(this, x, y, h, this.tiles[tileID]));
         }
       }
     }  
     for (let object of this.objects)  {
-      let h = this.tileAt(object.x, object.y)[1];
+      let h = this.heightAt(object.x, object.y);
       this.addChild(new IsoObjectSprite(this, object, h, this.objectDescriptors[object.id]));
     }
     for (let character of this.characters) {
@@ -87,11 +93,19 @@ class IsoMap extends PIXI.Container {
     }
   }
 
+  heightAt(x: number, y: number) {
+    return this._valueAt(this.heightData as number[], x, y);
+  }
+
   tileAt(x: number, y: number) {
+    return this._valueAt(this.mapData as number[], x, y);
+  }
+
+  private _valueAt(array: number[], x: number, y: number) {
     if (x < 0 || x >= (this.mapWidth as number) || y < 0 || y >= (this.mapHeight as number)) {
-      return [-1, -1];
+      return -1;
     }
-    return (this.mapData && this.mapData[x + y * (this.mapWidth as number)]) || [-1, -1];
+    return array[x + y * (this.mapWidth as number)];
   }
 
   get globalAttributes() : IsoMap.Attributes | null {
