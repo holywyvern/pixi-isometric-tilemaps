@@ -2,26 +2,84 @@ import * as PIXI    from 'pixi.js';
 import IsoCharacter from './IsoCharacter';
 import IsoMap       from './IsoMap';
 
+class AfterImage extends PIXI.Sprite {
+
+  children             : AfterImage[];
+
+  private _count       : number;
+  private _refreshTime : number;
+
+  previous            : PIXI.Sprite;
+
+  private _lastX       : number;
+  private _lastY       : number;
+
+  constructor(opacity: number, count: number) {
+    super();
+
+    this.alpha        = opacity;
+    this._count       = 1;
+    this._refreshTime = count;
+
+  }
+
+  setup(previous: PIXI.Sprite) {
+    this.previous    = previous;
+    this._lastX      = previous.x;
+    this._lastY      = previous.y;
+    this.x           = 0;
+    this.y           = 0;
+    this.texture     = previous.texture;
+    this.anchor      = previous.anchor;
+    previous.addChild(this);    
+  }
+
+  update(delta: number) {
+    this._count -= delta;
+    while (this._count < 0) {
+      this.x = this.previous.x - this._lastX;
+      this.y = this._lastY - this.previous.y;
+      this._count += this._refreshTime;
+      this._lastX = this.previous.x;
+      this._lastY = this.previous.y;
+    }
+    for (let child of this.children) {
+      child.update(delta);
+    }
+  }
+
+}
+
+export interface HasUpdate extends PIXI.DisplayObject {
+  update(delta: number): void;
+}
+
 class IsoCharacterSprite extends PIXI.Sprite {
 
-  private _character : IsoCharacter;
-  private _tilemap   : IsoMap;
-  
-  private _frameX    : number;
-  private _frameY    : number;
+  children             : HasUpdate[];
 
-  z                  : number|undefined;
+  private _character   : IsoCharacter;
+  private _tilemap     : IsoMap;
+  
+  private _frameX      : number;
+  private _frameY      : number;
+  private _afterImages : AfterImage|null;
+
+  z                    : number|undefined;
+
+  
 
   constructor(tilemap : IsoMap, character : IsoCharacter) {
     super();
-    this.texture    = new PIXI.Texture(character.texture || new PIXI.BaseTexture());
-    this._tilemap   = tilemap;
-    this._character = character;
-    this.z          = -1;
-    this._frameX    = 0;
-    this._frameY    = 0;
-    this.anchor.x   = 0.5;
-    this.anchor.y   = 1;
+    this.texture      = new PIXI.Texture(character.texture || new PIXI.BaseTexture());
+    this._tilemap     = tilemap;
+    this._character   = character;
+    this.z            = -1;
+    this._frameX      = 0;
+    this._frameY      = 0;
+    this.anchor.x     = 0.5;
+    this.anchor.y     = 1;
+    this._afterImages = null;
     this._updateZ();
     this._updateFrame();
   }
@@ -82,10 +140,41 @@ class IsoCharacterSprite extends PIXI.Sprite {
 
   }
 
+  private _updateAfterImages() {
+    if (this._character.afterImageRefreshed) {
+      this._refreshAfterImages();
+      this._character.afterImageRefreshed = false;
+    }
+  }
+
+  private _refreshAfterImages() {
+    if (this._afterImages) {
+      this.removeChild(this._afterImages);
+    }
+    this._afterImages = null;
+    let prev : PIXI.Sprite = this;
+    for (let i = 0, count = this._character.afterImageCount; i < count; ++i) {
+      let img = new AfterImage(0.5 - 0.5 * i / count, this._character.afterImageSpacing);
+      img.setup(prev);
+      prev = img;
+      if (i === 0) {
+        this._afterImages = img;
+      }
+    }
+  }
+
+  private _updateChildren(delta: number) {
+    for (let child of this.children) {
+      child.update(delta);
+    }
+  }
+
   update(delta: number) {
     this._character.update(delta);
     this._updateZ();
     this._updateFrame();
+    this._updateAfterImages();
+    this._updateChildren(delta);
   }
 
 }

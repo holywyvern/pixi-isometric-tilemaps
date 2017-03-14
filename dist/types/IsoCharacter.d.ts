@@ -18,6 +18,9 @@ declare abstract class IsoCharacter extends PIXI.Container {
     frameWidth: number;
     opacity: number;
     texture: PIXI.BaseTexture | null;
+    afterImageRefreshed: boolean;
+    afterImageSpacing: number;
+    afterImageCount: number;
     constructor(attributes: IsoMap.Attributes, frameWidth: number, texture?: PIXI.BaseTexture | null);
     height: number;
     moveTo(x: number, y: number, h?: number): this;
@@ -25,6 +28,9 @@ declare abstract class IsoCharacter extends PIXI.Container {
     face(direction: IsoCharacter.Direction): this;
     walk(direction: IsoCharacter.Direction, newHeight: number, duration: number): this;
     jump(direction: IsoCharacter.Direction, newHeight: number, jumpheight: number, duration: number): this;
+    startAfterImages(count: number, spacing: number): this;
+    endAfterImages(): this;
+    wait(time: number): this;
     private _refreshCoordinates();
     private _updateAnimation(delta);
     private _updateQueue(delta);
@@ -34,6 +40,25 @@ declare abstract class IsoCharacter extends PIXI.Container {
 }
 declare module IsoCharacter {
     interface Action {
+        update(delta: number, character: IsoCharacter): void;
+        isDone(): boolean;
+    }
+    interface AfterImage {
+        distance: number;
+        opacity: number;
+    }
+    class StartAfterImageAction implements Action {
+        count: number;
+        spacing: number;
+        private _isDone;
+        private _images;
+        constructor(count: number, spacing: number);
+        update(delta: number, character: IsoCharacter): void;
+        isDone(): boolean;
+    }
+    class EndAfterImageAction implements Action {
+        private _isDone;
+        constructor();
         update(delta: number, character: IsoCharacter): void;
         isDone(): boolean;
     }

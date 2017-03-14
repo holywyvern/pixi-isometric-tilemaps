@@ -1,4 +1,5 @@
-const path = require('path');
+const path    = require('path');
+const webpack = require('webpack');
 
 module.exports = [
   {
@@ -33,7 +34,12 @@ module.exports = [
           }
         }
       ]
-    }
+    },
+    plugins: [
+      new webpack.optimize.UglifyJsPlugin(),
+      new webpack.optimize.OccurrenceOrderPlugin(),
+      new webpack.optimize.DedupePlugin()
+    ]
   },
   {
     entry: path.join(__dirname, 'src', 'build.ts'),

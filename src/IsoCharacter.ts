@@ -7,24 +7,27 @@ abstract class IsoCharacter extends PIXI.Container {
     private   _queue     : IsoCharacter.Action[];
     private _animation   : IsoCharacter.AnimationAction|null;
     private _executing   : boolean;
-    
-    _attributes  : IsoMap.Attributes;
-    
-    x           : number;
-    y           : number;
-    h           : number;
-    j           : number;
 
-    mapX        : number;
-    mapY        : number;
-    mapH        : number;
+    _attributes          : IsoMap.Attributes;
 
-    scale       : PIXI.Point;
-    direction   : IsoCharacter.Direction;
-    frame       : number;
-    frameWidth  : number;
-    opacity     : number;
-    texture     : PIXI.BaseTexture|null;
+    x                    : number;
+    y                    : number;
+    h                    : number;
+    j                    : number;
+
+    mapX                 : number;
+    mapY                 : number;
+    mapH                 : number;
+
+    scale                : PIXI.Point;
+    direction            : IsoCharacter.Direction;
+    frame                : number;
+    frameWidth           : number;
+    opacity              : number;
+    texture              : PIXI.BaseTexture|null;
+    afterImageRefreshed  : boolean;
+    afterImageSpacing    : number;
+    afterImageCount      : number;
 
     constructor(attributes: IsoMap.Attributes, frameWidth: number, texture: PIXI.BaseTexture|null=null) {
         super();
@@ -41,6 +44,8 @@ abstract class IsoCharacter extends PIXI.Container {
         this._animation = null;
         this._executing  = false;
         this.scale = new PIXI.Point(1, 1);
+        this.afterImageCount     = 0;
+        this.afterImageSpacing   = 0;
     }
 
 
@@ -102,6 +107,23 @@ abstract class IsoCharacter extends PIXI.Container {
         return this;
     }
 
+    startAfterImages(count: number, spacing: number) {
+        this._queue.push(new IsoCharacter.StartAfterImageAction(
+            count, spacing
+        ));  
+        return this.wait(1);
+    }
+
+    endAfterImages() {
+         this._queue.push(new IsoCharacter.EndAfterImageAction());  
+         return this.wait(1);
+    }
+
+    wait(time: number) {
+        this._queue.push(new IsoCharacter.WaitAction(time));
+        return this;
+    }
+
     private _refreshCoordinates() {
         this.x = (this.mapX - this.mapY) * this._attributes.tileWidth / 2;
         this.y = (this.mapX + this.mapY) * this._attributes.tileWidth / 4;      
@@ -145,6 +167,58 @@ module IsoCharacter {
     export interface Action {
         update(delta: number, character: IsoCharacter): void;
         isDone(): boolean;
+    }
+
+    export interface AfterImage {
+        distance: number;
+        opacity:  number;
+    }
+
+    export class StartAfterImageAction implements Action {
+
+        count   : number;
+        spacing : number;
+
+        private _isDone : boolean;
+
+        private _images: AfterImage[];
+
+        constructor(count: number, spacing: number) {
+            this._images = [];
+            this.count = count;
+            this.spacing = spacing;
+
+        }
+
+        update(delta: number, character: IsoCharacter) {
+            character.afterImageCount     = this.count;
+            character.afterImageSpacing   = this.spacing;
+            character.afterImageRefreshed = true;
+            this._isDone = true;
+        }
+
+        isDone() {
+            return this._isDone;
+        }
+    }
+
+    export class EndAfterImageAction implements Action {
+
+        private _isDone : boolean;
+
+        constructor() {
+            this._isDone = false;
+        }
+
+        update(delta: number, character: IsoCharacter) {
+            character.afterImageCount = 0;
+            character.afterImageRefreshed = true;
+            this._isDone = true;
+        }
+
+        isDone() {
+            return this._isDone;
+        }
     }
 
     export class WaitAction implements Action {
@@ -296,7 +370,8 @@ module IsoCharacter {
             if (this.isDone()) {
                 character.x    = this._targetX;
                 character.y    = this._targetY;
-                character.h    = this._targetH;  
+                character.h    = this._targetH;
+                character.j    = 0;  
                 character.mapX = this._newMapX;
                 character.mapY = this._newMapY;
             }

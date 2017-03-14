@@ -10964,6 +10964,8 @@ var IsoCharacter = (function (_super) {
         _this._animation = null;
         _this._executing = false;
         _this.scale = new PIXI.Point(1, 1);
+        _this.afterImageCount = 0;
+        _this.afterImageSpacing = 0;
         return _this;
     }
     Object.defineProperty(IsoCharacter.prototype, "height", {
@@ -11010,6 +11012,18 @@ var IsoCharacter = (function (_super) {
         this._queue.push(new IsoCharacter.JumpAction(direction, newHeight, jumpheight, duration));
         return this;
     };
+    IsoCharacter.prototype.startAfterImages = function (count, spacing) {
+        this._queue.push(new IsoCharacter.StartAfterImageAction(count, spacing));
+        return this.wait(1);
+    };
+    IsoCharacter.prototype.endAfterImages = function () {
+        this._queue.push(new IsoCharacter.EndAfterImageAction());
+        return this.wait(1);
+    };
+    IsoCharacter.prototype.wait = function (time) {
+        this._queue.push(new IsoCharacter.WaitAction(time));
+        return this;
+    };
     IsoCharacter.prototype._refreshCoordinates = function () {
         this.x = (this.mapX - this.mapY) * this._attributes.tileWidth / 2;
         this.y = (this.mapX + this.mapY) * this._attributes.tileWidth / 4;
@@ -11042,6 +11056,39 @@ var IsoCharacter = (function (_super) {
     return IsoCharacter;
 }(PIXI.Container));
 (function (IsoCharacter) {
+    var StartAfterImageAction = (function () {
+        function StartAfterImageAction(count, spacing) {
+            this._images = [];
+            this.count = count;
+            this.spacing = spacing;
+        }
+        StartAfterImageAction.prototype.update = function (delta, character) {
+            character.afterImageCount = this.count;
+            character.afterImageSpacing = this.spacing;
+            character.afterImageRefreshed = true;
+            this._isDone = true;
+        };
+        StartAfterImageAction.prototype.isDone = function () {
+            return this._isDone;
+        };
+        return StartAfterImageAction;
+    }());
+    IsoCharacter.StartAfterImageAction = StartAfterImageAction;
+    var EndAfterImageAction = (function () {
+        function EndAfterImageAction() {
+            this._isDone = false;
+        }
+        EndAfterImageAction.prototype.update = function (delta, character) {
+            character.afterImageCount = 0;
+            character.afterImageRefreshed = true;
+            this._isDone = true;
+        };
+        EndAfterImageAction.prototype.isDone = function () {
+            return this._isDone;
+        };
+        return EndAfterImageAction;
+    }());
+    IsoCharacter.EndAfterImageAction = EndAfterImageAction;
     var WaitAction = (function () {
         function WaitAction(time) {
             this.time = time;
@@ -11155,6 +11202,7 @@ var IsoCharacter = (function (_super) {
                 character.x = this._targetX;
                 character.y = this._targetY;
                 character.h = this._targetH;
+                character.j = 0;
                 character.mapX = this._newMapX;
                 character.mapY = this._newMapY;
             }
@@ -39645,6 +39693,41 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = __webpack_require__(8);
 var IsoCharacter_1 = __webpack_require__(38);
+var AfterImage = (function (_super) {
+    __extends(AfterImage, _super);
+    function AfterImage(opacity, count) {
+        var _this = _super.call(this) || this;
+        _this.alpha = opacity;
+        _this._count = 1;
+        _this._refreshTime = count;
+        return _this;
+    }
+    AfterImage.prototype.setup = function (previous) {
+        this.previous = previous;
+        this._lastX = previous.x;
+        this._lastY = previous.y;
+        this.x = 0;
+        this.y = 0;
+        this.texture = previous.texture;
+        this.anchor = previous.anchor;
+        previous.addChild(this);
+    };
+    AfterImage.prototype.update = function (delta) {
+        this._count -= delta;
+        while (this._count < 0) {
+            this.x = this.previous.x - this._lastX;
+            this.y = this._lastY - this.previous.y;
+            this._count += this._refreshTime;
+            this._lastX = this.previous.x;
+            this._lastY = this.previous.y;
+        }
+        for (var _i = 0, _a = this.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            child.update(delta);
+        }
+    };
+    return AfterImage;
+}(PIXI.Sprite));
 var IsoCharacterSprite = (function (_super) {
     __extends(IsoCharacterSprite, _super);
     function IsoCharacterSprite(tilemap, character) {
@@ -39657,6 +39740,7 @@ var IsoCharacterSprite = (function (_super) {
         _this._frameY = 0;
         _this.anchor.x = 0.5;
         _this.anchor.y = 1;
+        _this._afterImages = null;
         _this._updateZ();
         _this._updateFrame();
         return _this;
@@ -39717,10 +39801,39 @@ var IsoCharacterSprite = (function (_super) {
         this.position.x = this._character.x;
         this.position.y = this._character.y - this._character.h - this._character.j;
     };
+    IsoCharacterSprite.prototype._updateAfterImages = function () {
+        if (this._character.afterImageRefreshed) {
+            this._refreshAfterImages();
+            this._character.afterImageRefreshed = false;
+        }
+    };
+    IsoCharacterSprite.prototype._refreshAfterImages = function () {
+        if (this._afterImages) {
+            this.removeChild(this._afterImages);
+        }
+        this._afterImages = null;
+        var prev = this;
+        for (var i = 0, count = this._character.afterImageCount; i < count; ++i) {
+            var img = new AfterImage(0.5 - 0.5 * i / count, this._character.afterImageSpacing);
+            img.setup(prev);
+            prev = img;
+            if (i === 0) {
+                this._afterImages = img;
+            }
+        }
+    };
+    IsoCharacterSprite.prototype._updateChildren = function (delta) {
+        for (var _i = 0, _a = this.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            child.update(delta);
+        }
+    };
     IsoCharacterSprite.prototype.update = function (delta) {
         this._character.update(delta);
         this._updateZ();
         this._updateFrame();
+        this._updateAfterImages();
+        this._updateChildren(delta);
     };
     return IsoCharacterSprite;
 }(PIXI.Sprite));
@@ -40843,14 +40956,18 @@ var CHARACTERS = [
         .walk(IsoCharacter_1.default.Direction.UP, 0, 1000)
         .face(IsoCharacter_1.default.Direction.RIGHT),
     new TestCharacter().moveTo(4, 6, 5)
+        .startAfterImages(4, 40)
         .face(IsoCharacter_1.default.Direction.LEFT)
-        .jump(IsoCharacter_1.default.Direction.LEFT, 0, 64, 400),
+        .jump(IsoCharacter_1.default.Direction.LEFT, 0, 64, 400)
+        .endAfterImages(),
     new TestCharacter().moveTo(3, 7, 1)
         .face(IsoCharacter_1.default.Direction.RIGHT)
         .jump(IsoCharacter_1.default.Direction.RIGHT, 5, 48, 400),
     new TestCharacter().moveTo(3, 8, 0)
         .face(IsoCharacter_1.default.Direction.LEFT)
-        .jump(IsoCharacter_1.default.Direction.CENTER, 0, 48, 300),
+        .startAfterImages(3, 50)
+        .jump(IsoCharacter_1.default.Direction.CENTER, 0, 200, 500)
+        .endAfterImages(),
 ];
 var OBJECT_DESCRIPTORS = [
     { tileset: 0, frame: new PIXI.Rectangle(0, 80, 64, 80), type: "tree" },
