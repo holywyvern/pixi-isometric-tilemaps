@@ -64,6 +64,7 @@ declare module IsoCharacter {
         direction: Direction;
         duration: number;
         newHeight: number;
+        distance: number;
         protected _targetX: number;
         protected _targetY: number;
         protected _targetH: number;
@@ -73,7 +74,7 @@ declare module IsoCharacter {
         protected _newMapX: number;
         protected _newMapY: number;
         protected _targetSet: boolean;
-        constructor(direction: Direction, newHeight: number, duration: number);
+        constructor(direction: Direction, newHeight: number, duration: number, distance?: number);
         protected _setTarget(character: IsoCharacter): void;
         update(delta: number, character: IsoCharacter): void;
         protected _endWhenDone(character: IsoCharacter): void;
@@ -84,7 +85,7 @@ declare module IsoCharacter {
         totalDuration: number;
         private _angle;
         private _angleInc;
-        constructor(direction: Direction, newHeight: number, jumpHeight: number, duration: number);
+        constructor(direction: Direction, newHeight: number, jumpHeight: number, duration: number, distance?: number);
         update(delta: number, character: IsoCharacter): void;
     }
     enum Direction {

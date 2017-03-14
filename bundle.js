@@ -11096,9 +11096,11 @@ var IsoCharacter = (function (_super) {
     }());
     IsoCharacter.FaceAction = FaceAction;
     var WalkAction = (function () {
-        function WalkAction(direction, newHeight, duration) {
+        function WalkAction(direction, newHeight, duration, distance) {
+            if (distance === void 0) { distance = 1; }
             this.direction = direction;
             this.duration = duration;
+            this.distance = distance;
             this.newHeight = newHeight;
             this._targetSet = false;
         }
@@ -11106,22 +11108,24 @@ var IsoCharacter = (function (_super) {
             var x = 0, y = 0;
             switch (this.direction) {
                 case Direction.UP:
-                    x = character.mapX - 1;
+                    x = character.mapX - this.distance;
                     y = character.mapY;
                     break;
                 case Direction.DOWN:
-                    x = character.mapX + 1;
+                    x = character.mapX + this.distance;
                     y = character.mapY;
                     break;
                 case Direction.LEFT:
                     x = character.mapX;
-                    y = character.mapY + 1;
+                    y = character.mapY + this.distance;
                     break;
                 case Direction.RIGHT:
                     x = character.mapX;
-                    y = character.mapY - 1;
+                    y = character.mapY - this.distance;
                     break;
                 default:
+                    x = character.mapX;
+                    y = character.mapY;
                     break;
             }
             this._newMapX = x;
@@ -11163,8 +11167,9 @@ var IsoCharacter = (function (_super) {
     IsoCharacter.WalkAction = WalkAction;
     var JumpAction = (function (_super) {
         __extends(JumpAction, _super);
-        function JumpAction(direction, newHeight, jumpHeight, duration) {
-            var _this = _super.call(this, direction, newHeight, duration) || this;
+        function JumpAction(direction, newHeight, jumpHeight, duration, distance) {
+            if (distance === void 0) { distance = 1; }
+            var _this = _super.call(this, direction, newHeight, duration, distance) || this;
             _this.totalDuration = duration;
             _this.jumpHeight = jumpHeight;
             _this._angle = 0;
@@ -40839,10 +40844,13 @@ var CHARACTERS = [
         .face(IsoCharacter_1.default.Direction.RIGHT),
     new TestCharacter().moveTo(4, 6, 5)
         .face(IsoCharacter_1.default.Direction.LEFT)
-        .jump(IsoCharacter_1.default.Direction.LEFT, 0, 64, 1000),
+        .jump(IsoCharacter_1.default.Direction.LEFT, 0, 64, 400),
     new TestCharacter().moveTo(3, 7, 1)
         .face(IsoCharacter_1.default.Direction.RIGHT)
-        .jump(IsoCharacter_1.default.Direction.RIGHT, 5, 48, 1000),
+        .jump(IsoCharacter_1.default.Direction.RIGHT, 5, 48, 400),
+    new TestCharacter().moveTo(3, 8, 0)
+        .face(IsoCharacter_1.default.Direction.LEFT)
+        .jump(IsoCharacter_1.default.Direction.CENTER, 0, 48, 300),
 ];
 var OBJECT_DESCRIPTORS = [
     { tileset: 0, frame: new PIXI.Rectangle(0, 80, 64, 80), type: "tree" },

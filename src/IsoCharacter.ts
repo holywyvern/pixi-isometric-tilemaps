@@ -224,6 +224,7 @@ module IsoCharacter {
         direction : Direction;
         duration  : number;
         newHeight : number;
+        distance  : number;
 
         protected _targetX   : number;
         protected _targetY   : number;
@@ -235,9 +236,10 @@ module IsoCharacter {
         protected _newMapY   : number;
         protected _targetSet : boolean;
 
-        constructor(direction: Direction, newHeight: number, duration: number) {
+        constructor(direction: Direction, newHeight: number, duration: number, distance= 1) {
             this.direction = direction;
             this.duration  = duration;
+            this.distance  = distance;
             this.newHeight = newHeight;
             this._targetSet = false;
         }
@@ -246,22 +248,24 @@ module IsoCharacter {
             let x = 0, y = 0;
             switch (this.direction) {
                 case Direction.UP:
-                    x = character.mapX - 1;
+                    x = character.mapX - this.distance;
                     y = character.mapY;
                     break;
                 case Direction.DOWN:
-                    x = character.mapX + 1;
+                    x = character.mapX + this.distance;
                     y = character.mapY;               
                     break;
                 case Direction.LEFT:
                     x = character.mapX;
-                    y = character.mapY + 1;                
+                    y = character.mapY + this.distance;                
                     break;
                 case Direction.RIGHT:
                     x = character.mapX;
-                    y = character.mapY - 1;                  
+                    y = character.mapY - this.distance;                  
                     break;
                 default:
+                    x = character.mapX;
+                    y = character.mapY;                  
                     break;
             }
             this._newMapX = x;
@@ -312,8 +316,8 @@ module IsoCharacter {
         private _angle    : number;
         private _angleInc : number;
 
-        constructor(direction: Direction, newHeight: number, jumpHeight: number, duration: number) {
-            super(direction, newHeight, duration);
+        constructor(direction: Direction, newHeight: number, jumpHeight: number, duration: number, distance = 1) {
+            super(direction, newHeight, duration, distance);
             this.totalDuration = duration;
             this.jumpHeight    = jumpHeight;
             this._angle        = 0;

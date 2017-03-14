@@ -79,10 +79,13 @@ const CHARACTERS : IsoCharacter[] = [
     .face(IsoCharacter.Direction.RIGHT),
   new TestCharacter().moveTo(4, 6,  5)
     .face(IsoCharacter.Direction.LEFT)
-    .jump(IsoCharacter.Direction.LEFT, 0, 64, 1000),
+    .jump(IsoCharacter.Direction.LEFT, 0, 64, 400),
   new TestCharacter().moveTo(3, 7,  1)
     .face(IsoCharacter.Direction.RIGHT)
-    .jump(IsoCharacter.Direction.RIGHT, 5, 48, 1000),    
+    .jump(IsoCharacter.Direction.RIGHT, 5, 48, 400),    
+  new TestCharacter().moveTo(3, 8,  0)
+    .face(IsoCharacter.Direction.LEFT)
+    .jump(IsoCharacter.Direction.CENTER, 0, 48, 300),        
 ];
 
 const OBJECT_DESCRIPTORS : IsoObject[] = [
