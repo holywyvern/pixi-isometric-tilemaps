@@ -99,10 +99,44 @@ The height of the map in tiles
 
 ### tilemap.mapData
 
-Contains an array of tiles of size tilemap.mapWidth * tilemap.mapHeaight.
+Contains an array of tiles of size tilemap.mapWidth * tilemap.mapHeight.
 
-Each tile is an array of two values, the first being the tile index of tilemap.tiles, or -1 if you don't want a tile
-and a value indicating the height of the tile.
+Each tile is a number, representing the index on the tilemap.tiles array.
+If you use a number less than 0, the tile won't exits and it will be empty space.
+
+For example, a 3x3 map looks like this:
+
+```js
+[
+  0,  0,  0,
+  0,  0,  0,
+  0,  0, -1
+]
+```
+
+The -1 means than that square doesn't exists at all. so it will be a 3x3 map, with the bottom right
+corner deleted.
+
+
+### tilemap.heightData
+
+Contains an array of tiles of size tilemap.mapWidth * tilemap.mapHeight.
+Each number represents the height of the tile, from 0 to any higher number you like.
+When the tile is -1, the height may be -1 to allow 0 indexed tiles have walls on them.
+
+For example, the map of the example above may have something like this:
+
+```js
+[
+  0,  0,  0,
+  0,  1,  0,
+  0,  0, -1
+]
+```
+
+Where it will be all flat, except for the middle square, it will have some elevation.
+
+The -1 is to make the non existent tile work properly.
 
 ### tilemap.objects 
 
@@ -125,3 +159,14 @@ They are also animated, and have convenience methods to make they walk or jump.
 In order to have a character, you **must** extend IsoCharacter.
 
 After you do, you may set it's properties and anything you need on them.
+
+### tilemap.interactiveTiles
+
+Allows the tiles to have extra events if you set ti to a true value.
+
+The following events will work with the tilemap:
+
+|     event     | parameters        |              description                                                      |
+|---------------|-------------------|-------------------------------------------------------------------------------|
+| tile-selected | point: PIXI.Point | Emited when a tile is clicked. It takes into account the height of the tile.  |
+

@@ -18,6 +18,7 @@ declare class IsoTile extends PIXI.Container {
     private _bottomRightTexture;
     private _topRightWallTexture;
     constructor(tilemap: IsoMap, x: number, y: number, height: number, attributes: IsoTile.Attributes);
+    onClick: (event: PIXI.interaction.InteractionEvent) => void;
     private _setupRects();
     private _updateRect();
     private _updatePosition();

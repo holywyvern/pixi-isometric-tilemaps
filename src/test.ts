@@ -166,8 +166,10 @@ function setup() {
   tilemap.heightData        = HEIGHT_DATA;
   tilemap.objects           = OBJECTS;
   tilemap.characters        = CHARACTERS;
+  tilemap.interactiveTiles  = true;
   tilemap.x = 600;
   tilemap.y = 400;
+  tilemap.on('tile-selected', (p: PIXI.Point) => console.log(p));
   tilemap.build();
   now = Date.now();
   raf(update);

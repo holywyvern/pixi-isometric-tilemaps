@@ -19689,6 +19689,7 @@ var IsoMap = (function (_super) {
     function IsoMap() {
         var _this = _super.call(this) || this;
         _this.clean();
+        _this.interactiveTiles = false;
         return _this;
     }
     Object.defineProperty(IsoMap.prototype, "camera", {
@@ -39932,6 +39933,19 @@ var IsoTile = (function (_super) {
     __extends(IsoTile, _super);
     function IsoTile(tilemap, x, y, height, attributes) {
         var _this = _super.call(this) || this;
+        _this.onClick = function (event) {
+            var target = event.target;
+            if (target) {
+                var mousePos = event.data.getLocalPosition(target);
+                var w = target.width / 2;
+                var h = target.height / 2;
+                mousePos.y -= h;
+                if (Math.abs(mousePos.x) * h + Math.abs(mousePos.y) * w <= w * h) {
+                    event.stopPropagation();
+                    _this._tilemap.emit('tile-selected', _this._tileX, _this._tileY);
+                }
+            }
+        };
         _this._tilemap = tilemap;
         var ga = tilemap.globalAttributes;
         _this._globalAttributes = ga;
@@ -40043,6 +40057,8 @@ var IsoTile = (function (_super) {
         var top = new PIXI.Sprite(this._topTexture);
         top.y = -(ga.tileWidth / 2 + ga.heightSize * this._tileHeight);
         top.anchor.x = 0.5;
+        top.interactive = this._tilemap.interactiveTiles;
+        top.on('click', this.onClick);
         this.addChild(top);
     };
     IsoTile.prototype._calculateMaxHeight = function () {
@@ -41041,8 +41057,10 @@ function setup() {
     tilemap.heightData = HEIGHT_DATA;
     tilemap.objects = OBJECTS;
     tilemap.characters = CHARACTERS;
+    tilemap.interactiveTiles = true;
     tilemap.x = 600;
     tilemap.y = 400;
+    tilemap.on('tile-selected', function (x, y) { return console.log(x, y); });
     tilemap.build();
     now = Date.now();
     raf(update);

@@ -7,6 +7,7 @@ declare class IsoMap extends PIXI.Container {
     options: null | IsoMap.Attributes;
     tiles: null | IsoTile.Attributes[];
     textures: null | PIXI.BaseTexture[];
+    interactiveTiles: boolean;
     mapWidth: null | number;
     mapHeight: null | number;
     mapData: null | number[];

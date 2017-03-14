@@ -43,6 +43,20 @@ class IsoTile extends PIXI.Container {
     this._updateRect();
   }
 
+  onClick = (event: PIXI.interaction.InteractionEvent) => {
+    const target = event.target;
+    if (target) {
+      const mousePos = event.data.getLocalPosition(target);
+      const w = (target as PIXI.Sprite).width / 2;
+      const h = (target as PIXI.Sprite).height / 2;   
+      mousePos.y -= h;
+      if (Math.abs(mousePos.x) * h + Math.abs(mousePos.y) * w <= w * h) {
+        event.stopPropagation();
+        this._tilemap.emit('tile-selected', new PIXI.Point(this._tileX, this._tileY));
+      }
+    }
+  }
+
   private _setupRects() {
     const ga = this._globalAttributes;
     const texture             = this._tilemap.textures ? this._tilemap.textures[this._attributes.tileset] :  EMPTY_TEXTURE;
@@ -147,6 +161,8 @@ class IsoTile extends PIXI.Container {
     let top = new PIXI.Sprite(this._topTexture);
     top.y = -(ga.tileWidth / 2 + ga.heightSize * this._tileHeight);
     top.anchor.x = 0.5;
+    top.interactive = this._tilemap.interactiveTiles;
+    top.on('click', this.onClick);
     this.addChild(top);
   }
 
