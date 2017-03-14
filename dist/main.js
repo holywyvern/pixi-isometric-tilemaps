@@ -430,7 +430,7 @@ var IsoTile = (function (_super) {
                 mousePos.y -= h;
                 if (Math.abs(mousePos.x) * h + Math.abs(mousePos.y) * w <= w * h) {
                     event.stopPropagation();
-                    _this._tilemap.emit('tile-selected', _this._tileX, _this._tileY);
+                    _this._tilemap.emit('tile-selected', new PIXI.Point(_this._tileX, _this._tileY));
                 }
             }
         };

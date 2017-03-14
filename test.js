@@ -39942,7 +39942,7 @@ var IsoTile = (function (_super) {
                 mousePos.y -= h;
                 if (Math.abs(mousePos.x) * h + Math.abs(mousePos.y) * w <= w * h) {
                     event.stopPropagation();
-                    _this._tilemap.emit('tile-selected', _this._tileX, _this._tileY);
+                    _this._tilemap.emit('tile-selected', new PIXI.Point(_this._tileX, _this._tileY));
                 }
             }
         };
@@ -41060,7 +41060,7 @@ function setup() {
     tilemap.interactiveTiles = true;
     tilemap.x = 600;
     tilemap.y = 400;
-    tilemap.on('tile-selected', function (x, y) { return console.log(x, y); });
+    tilemap.on('tile-selected', function (p) { return console.log(p); });
     tilemap.build();
     now = Date.now();
     raf(update);

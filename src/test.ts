@@ -1,3 +1,12 @@
+/* -------------------------------------------------------------------------- *\
+ * tile.ts
+ * Author: Ramiro Rojo <ramiro.rojo.cretta@gmail.com>
+ * Apache 2.0 License - See LICENSE for details.
+ * --------------------------------------------------------------------------
+ * This file is part of the pixi-isometric-tilemaps package.
+ * Contains a demo for testing how tilemaps are shown.
+\* ------------------------------------------------------------------------- */
+
 import * as PIXI    from 'pixi.js';
 import * as raf     from 'raf';
 

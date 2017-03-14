@@ -1,3 +1,14 @@
+/* -------------------------------------------------------------------------- *\
+ * IsoCharacter.ts
+ * Author: Ramiro Rojo <ramiro.rojo.cretta@gmail.com>
+ * Apache 2.0 License - See LICENSE for details.
+ * --------------------------------------------------------------------------
+ * This file is part of the pixi-isometric-tilemaps package.
+ * Handles a character on a map. The difference with them and objects are than.
+ * Objects are not animated, and are part of the tileset.
+ * Characters can have animations and can be in the middle of a tile.
+\* ------------------------------------------------------------------------- */
+
 import * as PIXI from 'pixi.js';
 
 import IsoMap    from './IsoMap';

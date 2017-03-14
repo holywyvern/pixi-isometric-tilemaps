@@ -1,3 +1,12 @@
+/* -------------------------------------------------------------------------- *\
+ * IsoTile.ts
+ * Author: Ramiro Rojo <ramiro.rojo.cretta@gmail.com>
+ * Apache 2.0 License - See LICENSE for details.
+ * --------------------------------------------------------------------------
+ * This file is part of the pixi-isometric-tilemaps package.
+ * Contains the tile class for isometric maps.
+\* ------------------------------------------------------------------------- */
+
 import * as PIXI from 'pixi.js';
 import IsoMap    from './IsoMap';
 

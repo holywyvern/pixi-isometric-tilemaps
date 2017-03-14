@@ -1,3 +1,12 @@
+/* -------------------------------------------------------------------------- *\
+ * utils.ts
+ * Author: Ramiro Rojo <ramiro.rojo.cretta@gmail.com>
+ * Apache 2.0 License - See LICENSE for details.
+ * --------------------------------------------------------------------------
+ * This file is part of the pixi-isometric-tilemaps package.
+ * Containssome utilities for coordinate conversions.
+\* ------------------------------------------------------------------------- */
+
 import * as PIXI from 'pixi.js';
 
 export function fromIsoTo2D(pt:PIXI.Point):PIXI.Point{
