@@ -162,7 +162,7 @@ After you do, you may set it's properties and anything you need on them.
 
 ### tilemap.interactiveTiles
 
-Allows the tiles to have extra events if you set ti to a true value.
+Allows the tiles to have extra events if you set it to a true value.
 
 The following events will work with the tilemap:
 
