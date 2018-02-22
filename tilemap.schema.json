@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Tilemap",
+    "properties": {
+        "tileWidth": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "slabHeight": {
+            "type": "integer",
+            "minimum": 1
+        },        
+        "textures": {
+            "type":"array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "walls": {
+            "type":"array",
+            "items": {
+                "type": "object"
+            }
+        },        
+        "floors": {
+            "type":"array",
+            "items": {
+                "type": "object"
+            }
+        },        
+        "objects": {
+            "type":"array",
+            "items": {
+                "type": "object"
+            }
+        }
+    },
+    "required": [
+        "tileWidth", "slabHeight", "textures", "walls", "floors", "objects"
+    ]
+}
