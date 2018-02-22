@@ -1,7 +1,7 @@
 {
   "name": "pixi-isometric-tilemaps",
-  "version": "0.1.0",
-  "description": "Isometric tilemaps with PIXI.js",
+  "version": "2.0.0",
+  "description": "Isometric tilemaps for PIXI.js v^4.7.0",
   "main": "./dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,21 +9,13 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/holywyvern/pixi-isometric-tilemaps.git"
-  },  
+  },
   "types": "./dist/types/build.d.ts",
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
-    "fpsmeter": "^0.3.1",
-    "pixi.js": "^4.4.1",
-    "raf": "^3.3.0"
+    "pixi.js": "^4.7.0"
   },
-  "devDependencies": {
-    "@types/fpsmeter": "^0.3.28",
-    "@types/pixi.js": "^4.3.2",    
-    "ts-loader": "^2.0.1",
-    "typescript": "^2.2.1",
-    "webpack": "^2.2.1"
-  }
+  "devDependencies": {}
 }
